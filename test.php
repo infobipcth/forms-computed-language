@@ -1,6 +1,5 @@
 <?php
 include 'vendor/autoload.php';
-include 'Evaluator.php';
 
 use FormsComputedLanguage\Evaluator;
 use PhpParser\Error;
@@ -13,10 +12,40 @@ include 'form.php';
 $code = <<<'CODE'
 <?php
 
+$radeLiFunkcijeIOperatori = round(5/2 + 0.02);
+$radeLiFunkcijeIOperatori += 1;
+
 // channels and tech kalkulacija
-$channelsAndTechScore = round(countSelectedItems($productOfInterest) / 3);
-$channelsAndTechScore += countSelectedItems($whereAreYouUsingAutomation);
-$channelsAndTechScore += countSelectedItems($whereAI);
+$channelsAndTechScore = round(countSelectedItems($dropdown_multiple) / 3);
+$channelsAndTechScore += countSelectedItems($checkbox_multiple);
+
+$a = 0;
+
+if ($a < 3) {
+    $a = 2;
+}
+elseif($a <= 5) {
+    $a = 8;
+}
+else {
+    $a = $a + 10;
+}
+CODE;
+
+$morecode = <<<'CODE'
+<?php
+
+switch ($dropdown) {
+    case 'Value 1':
+        $channelsAndTechScore += 0;
+    break;
+    case 'Value 2':
+        $channelsAndTechScore += 1;
+    break;
+    case 'Value 3':
+        $channelsAndTechScore += 3;
+    break;
+}
 
 switch ($omnichannel) {
     case 'a':
@@ -92,7 +121,8 @@ try {
 $dumper = new NodeDumper;
 
 $traverser = new NodeTraverser;
-var_dump($form);
-$traverser->addVisitor(new Evaluator($form));
+//var_dump($form);
+echo $dumper->dump($ast) . "\n";
+$eval = new Evaluator($form);
+$traverser->addVisitor($eval);
 $traverser->traverse($ast);
-//echo $dumper->dump($ast) . "\n";

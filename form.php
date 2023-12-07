@@ -1,3 +1,3 @@
 <?php
 
-$form = json_decode(file_get_contents('form.json'));
+$form = json_decode(file_get_contents('form.json'), true);

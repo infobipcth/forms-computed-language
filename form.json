@@ -16,14 +16,14 @@
 	"datetime": "2023-12-27T11:00:00.000Z",
 	"dropdown": "Value 1",
 	"radiobutton": "Value 1",
-	"dropdown-multiple": [
+	"dropdown_multiple": [
 		"Value 2",
 		"Value 1"
 	],
 	"singleCheckbox": {
 		"true": "true"
 	},
-	"checkboxes-multiple": {
+	"checkbox_multiple": {
 		"Value 1": "Value 1",
 		"Value 2": "Value 2"
 	},

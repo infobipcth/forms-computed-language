@@ -17,6 +17,14 @@ class Round {
             $type = gettype($args[0]);
             throw new TypeException("round() called with {$type} as first argument, requires a numeric argument");
         }
+        if (isset($args[1]) && !is_int($args[1])) {
+            $type = gettype($args[1]);
+            throw new TypeException("round() called with {$type} as second argument, requires an int");
+        }
+        if (isset($args[2]) && !is_int($args[2])) {
+            $type = gettype($args[2]);
+            throw new TypeException("round() called with {$type} as third argument, requires an int");
+        }
         switch ($argc) {
             case 1:
                 return round($args[0]);
