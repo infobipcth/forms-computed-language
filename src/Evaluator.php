@@ -29,16 +29,21 @@ use PhpParser\Node\Expr\BinaryOp\NotEqual;
 use PhpParser\Node\Expr\BinaryOp\Plus;
 use PhpParser\Node\Expr\BinaryOp\Smaller;
 use PhpParser\Node\Expr\BinaryOp\SmallerOrEqual;
+use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Expr\Ternary;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Scalar;
+use PhpParser\Node\Stmt\Else_;
+use PhpParser\Node\Stmt\ElseIf_;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\If_;
 use PhpParser\Node\Stmt\Switch_;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 
-class Evaluator extends NodeVisitorAbstract {
+class Evaluator extends NodeVisitorAbstract
+{
     private array $vars = [];
     private array $stack = [];
 
@@ -47,58 +52,120 @@ class Evaluator extends NodeVisitorAbstract {
         'countSelectedItems' => [CountSelectedItems::class, 'run'],
     ];
 
-    public function __construct(array $_vars) {
+    public function __construct(array $_vars)
+    {
         $this->vars = $_vars;
         $this->stack = [];
     }
 
     public function enterNode(Node $node)
     {
+        
+        $parent = $node->getAttribute('parentIf');
+        $parentElif = $node->getAttribute('parentElseif');
+        $parentTernary = $node->getAttribute('parentTernary');
+
         $nodet = get_class($node);
         echo "ENTERING NODE {$nodet} \n";
+
+        if ($parentElif) {
+            if ($parent->getAttribute('condTruthy')) {
+                return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+            }
+            if ($parent->getAttribute('hasEvaluatedElifs') === true) {
+                return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+            }
+            $elifRel = $node->getAttribute('parentElseifRelationship');
+            if ($elifRel === 'stmt' && $parentElif->getAttribute('condTruthy') == false) {
+                return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+            }
+            if ($parentElif->getAttribute('condTruthy')) {
+                $parent->setAttribute('hasEvaluatedElifs', true);
+            }
+        }
+
+        if ($parentTernary) {
+            echo 'PARENT TERNARY!';
+            var_dump($parentTernary->getAttribute('condTruthy'));
+            $parentRel = $node->getAttribute('parentTernaryRelationship');
+            if ($parentTernary->getAttribute('condTruthy')) {
+                if ($parentRel === 'else') {
+                    return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+                }
+            }
+            else {
+                if ($parentRel === 'if') {
+                    return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+                }
+            }
+        }
+        if ($parent) {
+            if (
+                $parent->getAttribute('condTruthy') == false
+                && $node->getAttribute('parentRelationship') === 'stmt'
+            ) {
+                return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+            }
+        }
+
         if ($node instanceof Scalar) {
             $this->stack[] = $node->value ?? null;
         }
 
         if ($node instanceof Variable) {
-            //echo "ADDING VARIABLE {$node->name} TO STACK \n";
-            //$v = $this->vars[$node->name] ?? null;
             $this->stack[] = $this->vars[$node->name] ?? null;
         }
 
-        if ($node instanceof Expression) {
-            //$this->stack[] = $node->expr;
-        }
-
         if ($node instanceof If_) {
-            $this->enterNode($node->cond);
-            var_dump($this->stack);
-            $condEvalutesTo = array_pop($this->stack);
-            if ($condEvalutesTo) {
-                foreach ($node->stmts as $childNode) {
-                    $this->enterNode($childNode);
-                }
-                return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+            if ($node->cond) {
+                $node->cond->setAttribute('parentIf', $node);
+                $node->cond->setAttribute('parentRelationship', 'cond');
+            }
+            foreach ($node->stmts ?? [] as $statement) {
+                $statement->setAttribute('parentIf', $node);
+                $statement->setAttribute('parentRelationship', 'stmt');
+            }
+            foreach ($node->elseifs ?? [] as $elseif) {
+                $elseif->setAttribute('parentIf', $node);
+                $elseif->setAttribute('parentRelationship', 'elif');
+            }
+            if ($node->else) {
+                $node->else->setAttribute('parentIf', $node);
+                $node->else->setAttribute('parentRelationship', 'else');
             }
             
-            foreach ($node->elseifs as $elif) {
-                $this->enterNode($elif->cond);
-                $condEvalutesTo = array_pop($this->stack);
-                if ($condEvalutesTo) {
-                    foreach ($elif->stmts as $childNode) {
-                        $this->enterNode($childNode);
-                    }
-                    return NodeTraverser::DONT_TRAVERSE_CHILDREN;
-                }
-            }
-
-            foreach($node->else->stmts as $el) {
-                $this->enterNode($el);
-            }            
-            return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+            //return NodeTraverser::DONT_TRAVERSE_CHILDREN;
         }
+        if ($node instanceof ElseIf_) {
+            if ($parent->getAttribute('hasEvaluatedElifs')) {
+                return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+            }
+            $node->cond->setAttribute('parentIf', $parent);
+            $node->cond->setAttribute('parentElseif', $node);
+            $node->cond->setAttribute('parentElseifRelationship', 'cond');
+            foreach($node->stmts as $stmt) {
+                $stmt->setAttribute('parentIf', $parent);
+                $stmt->setAttribute('parentElseif', $node);
+                $stmt->setAttribute('parentElseifRelationship', 'stmt');
+            }
+        }
+        if ($node instanceof Else_) {
+            if ($parent->getAttribute('condTruthy') == true) {
+                return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+            }
+            if ($parent->getAttribute('hasEvaluatedElifs') == true) {
+                return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+            }
+        }
+        if ($node instanceof Ternary) {
+            $node->cond->setAttribute('parentTernary', $node);
+            $node->cond->setAttribute('parentTernaryRelationship', 'cond');
+            $node->if->setAttribute('parentTernary', $node);
+            $node->if->setAttribute('parentTernaryRelationship', 'if');
+            $node->else->setAttribute('parentTernary', $node);
+            $node->else->setAttribute('parentTernaryRelationship', 'else');
 
-
+        }
     }
 
     public function leaveNode(Node $node)
@@ -131,27 +198,21 @@ class Evaluator extends NodeVisitorAbstract {
             $lhs = array_pop($this->stack);
             if ($node instanceof Concat) {
                 $this->stack[] = $lhs . $rhs;
-                return;
             }
-            if ($node instanceof Plus) {    
+            if ($node instanceof Plus) {
                 $this->stack[] = $lhs + $rhs;
-                return;
             }
-            if ($node instanceof Minus) {    
+            if ($node instanceof Minus) {
                 $this->stack[] = $lhs - $rhs;
-                return;
             }
             if ($node instanceof Mul) {
                 $this->stack[] = $lhs * $rhs;
-                return;
             }
             if ($node instanceof Div) {
                 $this->stack[] = $lhs / $rhs;
-                return;
             }
             if ($node instanceof Equal) {
                 $this->stack[] = $lhs == $rhs;
-                return;
             }
             if ($node instanceof NotEqual) {
                 $this->stack[] = $lhs != $rhs;
@@ -175,7 +236,9 @@ class Evaluator extends NodeVisitorAbstract {
                 $this->stack[] = ($lhs || $rhs);
             }
         }
-
+        if ($node instanceof ConstFetch) {
+            $this->stack[] = constant(Helpers::getFqnFromParts($node->name->parts));
+        }
         if ($node instanceof FuncCall) {
             $functionName = $node->name->getParts()[0];
             $argv = [];
@@ -187,8 +250,23 @@ class Evaluator extends NodeVisitorAbstract {
             if (!isset(self::FUNCTION_CALLBACKS[$functionName])) {
                 throw new UnknownFunctionException("Undefined function {$functionName} called");
             }
-            //var_dump($functionName, $argv);
             $this->stack[] = call_user_func_array(self::FUNCTION_CALLBACKS[$functionName], [$argv]);
+        }
+
+        if ($parentElseif = $node->getAttribute('parentElseif')) {
+            if ($node->getAttribute('parentElseifRelationship') === 'cond') {
+                $parentElseif->setAttribute('condTruthy', Helpers::arrayEnd($this->stack));
+            }
+        }
+        if ($parent = $node->getAttribute('parentIf')) {
+            if ($node->getAttribute('parentRelationship') === 'cond') {
+                $parent->setAttribute('condTruthy', Helpers::arrayEnd($this->stack));
+            }
+        }
+        if ($parentTernary = $node->getAttribute('parentTernary')) {
+            if ($node->getAttribute('parentTernaryRelationship') === 'cond') {
+                $parentTernary->setAttribute('condTruthy', Helpers::arrayEnd($this->stack));
+            }
         }
     }
 

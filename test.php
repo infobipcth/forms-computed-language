@@ -12,6 +12,24 @@ include 'form.php';
 $code = <<<'CODE'
 <?php
 
+$a = true;
+$b = false;
+$c = 'aaaa';
+$d = 'bbbb';
+$e = $c . $d;
+$f = $a && $b;
+$g = $a || $b;
+$t = 7;
+$t++;
+
+$r = $b ? 't' : 'f';
+
+if ($c == 'aaaa') {
+    $d = 'batman';
+}
+else {
+    $d = 'superman';
+}
 $radeLiFunkcijeIOperatori = round(5/2 + 0.02);
 $radeLiFunkcijeIOperatori += 1;
 
@@ -24,11 +42,33 @@ $a = 0;
 if ($a < 3) {
     $a = 2;
 }
+
+if ($a < 5) {
+    $a = 7;
+}
 elseif($a <= 5) {
-    $a = 8;
+     $a = 8;
+}
+elseif ($a >= 9) {
+    $a = 4;
 }
 else {
-    $a = $a + 10;
+     $a = $a + 10;
+}
+
+$b = 10;
+if (($b > 10 || $a < 10) && false) {
+    $a = $a + $b;
+}
+elseif ($b <= 20) {
+    $b = 40;
+}
+elseif($b <= 100 && $a > 5) {
+    $b = 494;
+}
+else {
+    $a = 100;
+    $b = 401;
 }
 CODE;
 
