@@ -2,12 +2,18 @@
 
 namespace FormsComputedLanguage;
 
+// Imports for...
+// PHP errors
 use Error;
+// FCL errors
 use FormsComputedLanguage\Exceptions\UndeclaredVariableUsageException;
 use FormsComputedLanguage\Exceptions\UnknownFunctionException;
 use FormsComputedLanguage\Exceptions\UnknownTokenException;
+// FCL functions
 use FormsComputedLanguage\Functions\CountSelectedItems;
 use FormsComputedLanguage\Functions\Round;
+use FormsComputedLanguage\Functions\IsSelected;
+// Node types from php-parser
 use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\Assign;
@@ -35,6 +41,8 @@ use PhpParser\Node\Expr\BooleanNot;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Ternary;
+use PhpParser\Node\Expr\UnaryMinus;
+use PhpParser\Node\Expr\UnaryPlus;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar;
@@ -68,6 +76,11 @@ class Evaluator extends NodeVisitorAbstract
     private array $stack = [];
 
     /**
+     * The language runner that called the evaluator.
+     */
+    private LanguageRunner $lr;
+
+    /**
      * Callbacks to run for available functions.
      */
     private const FUNCTION_CALLBACKS = [
@@ -81,10 +94,11 @@ class Evaluator extends NodeVisitorAbstract
      *
      * @param array $_vars Variables to initialize. Array keys are variable names, values are values.
      */
-    public function __construct(array $_vars)
+    public function __construct(array $_vars, LanguageRunner $_lr)
     {
         $this->vars = $_vars; // Initialize the variables to passed variables.
         $this->stack = []; // Initialize the empty stack.
+        $this->lr = $_lr; // Remember the language runner.
     }
 
     /**
@@ -302,6 +316,12 @@ class Evaluator extends NodeVisitorAbstract
             } else {
                 throw new UnknownTokenException("Unknown boolean operator {$nodeType} used");
             }
+        } elseif ($node instanceof UnaryMinus) {
+            $t = array_pop($this->stack);
+            $this->stack[] = -$t;
+        } elseif ($node instanceof UnaryPlus) {
+            $t = array_pop($this->stack);
+            $this->stack[] = +$t;
         } elseif ($node instanceof ConstFetch) {
             $constfqn = Helpers::getFqnFromParts($node->name->parts);
             try {
@@ -372,6 +392,7 @@ class Evaluator extends NodeVisitorAbstract
 
     public function afterTraverse(array $nodes)
     {
-        var_dump($this->vars);
+        $this->lr->setVars($this->vars);
+        //var_dump($this->vars);
     }
 }
