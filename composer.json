@@ -14,5 +14,13 @@
     ],
     "require": {
         "nikic/php-parser": "^4.17"
+    },
+    "require-dev": {
+        "pestphp/pest": "^2.28"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     }
 }
