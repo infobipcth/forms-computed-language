@@ -31,6 +31,7 @@ use PhpParser\Node\Expr\BinaryOp\NotEqual;
 use PhpParser\Node\Expr\BinaryOp\Plus;
 use PhpParser\Node\Expr\BinaryOp\Smaller;
 use PhpParser\Node\Expr\BinaryOp\SmallerOrEqual;
+use PhpParser\Node\Expr\BooleanNot;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Ternary;
@@ -322,6 +323,9 @@ class Evaluator extends NodeVisitorAbstract
             }
 
             $this->stack[] = call_user_func_array(self::FUNCTION_CALLBACKS[$functionName], [$argv]);
+        } elseif ($node instanceof BooleanNot) {
+            $temp = array_pop($this->stack);
+            $this->stack[] = !$temp;
         } elseif (
             $node instanceof Variable
             || $node instanceof Scalar
@@ -368,5 +372,6 @@ class Evaluator extends NodeVisitorAbstract
 
     public function afterTraverse(array $nodes)
     {
+        var_dump($this->vars);
     }
 }
