@@ -324,6 +324,9 @@ class Evaluator extends NodeVisitorAbstract
             $this->stack[] = +$t;
         } elseif ($node instanceof ConstFetch) {
             $constfqn = Helpers::getFqnFromParts($node->name->parts);
+            if (!$this->lr->canAccessConstant($constfqn)) { // Ask the language runner whether we can pass the constant.
+                throw new UndeclaredVariableUsageException("Tried to get the value of disallowed constant {$constfqn}");
+            }
             try {
                 $this->stack[] = constant($constfqn);
             } catch (Error $e) {
