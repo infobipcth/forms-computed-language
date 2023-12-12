@@ -4,6 +4,6 @@ namespace FormsComputedLanguage\Exceptions;
 
 use Exception;
 
-class UndeclaredVariableUsageException extends Exception {
-
+class UndeclaredVariableUsageException extends Exception
+{
 }

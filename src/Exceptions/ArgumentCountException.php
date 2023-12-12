@@ -4,6 +4,6 @@ namespace FormsComputedLanguage\Exceptions;
 
 use Exception;
 
-class ArgumentCountException extends Exception {
-
+class ArgumentCountException extends Exception
+{
 }

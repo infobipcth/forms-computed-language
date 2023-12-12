@@ -2,6 +2,8 @@
 
 namespace FormsComputedLanguage\Functions;
 
-interface FunctionInterface {
+/** Generic function interface */
+interface FunctionInterface
+{
     public static function run(array $args);
 }

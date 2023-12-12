@@ -5,10 +5,23 @@ namespace FormsComputedLanguage\Functions;
 use FormsComputedLanguage\Exceptions\ArgumentCountException;
 use FormsComputedLanguage\Exceptions\TypeException;
 
-class Round {
+/**
+ * Implements the round function.
+ * Call: round(int|float $num, int $precision = 0, int $mode = PHP_ROUND_HALF_UP): float
+ */
+class Round
+{
+    /** Function name */
     public const FUNCTION_NAME = 'round';
 
-    public static function run($args) {
+    /**
+     * Runs the Round function.
+     *
+     * @param array $args Array of arguments. See class docblock for signature.
+     * @return float Rounded number.
+     */
+    public static function run($args)
+    {
         $argc = (int)(count($args));
         if ($argc <= 0 || $argc >= 4) {
             throw new ArgumentCountException("the round() function called with {$argc} arguments, but has one required argument and two optional arguments");

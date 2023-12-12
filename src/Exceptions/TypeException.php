@@ -4,6 +4,6 @@ namespace FormsComputedLanguage\Exceptions;
 
 use Exception;
 
-class TypeException extends Exception {
-
+class TypeException extends Exception
+{
 }
