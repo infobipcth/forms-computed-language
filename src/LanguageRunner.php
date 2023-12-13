@@ -10,7 +10,8 @@ use PhpParser\ParserFactory;
 /**
  * Boots and shuts down the evaluator.
  */
-class LanguageRunner {
+class LanguageRunner
+{
     private $parser;
     private $code;
     private $vars;
@@ -22,7 +23,8 @@ class LanguageRunner {
     /**
      * Construct the language runner. Initialize the parser.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->parser = (new ParserFactory())->create(1);
     }
 
@@ -32,7 +34,8 @@ class LanguageRunner {
      * @param array $disallow Constants blacklist.
      * @return void
      */
-    public function setDisallowedConstants(array $disallow) {
+    public function setDisallowedConstants(array $disallow)
+    {
         $this->constantSettings['disallow'] = $disallow;
     }
 
@@ -42,7 +45,8 @@ class LanguageRunner {
      * @param array $allow Constants whitelist.
      * @return void
      */
-    public function setAllowedConstants(array $allow) {
+    public function setAllowedConstants(array $allow)
+    {
         $this->constantSettings['allow'] = $allow;
     }
 
@@ -52,7 +56,8 @@ class LanguageRunner {
      * @param string $type 'whitelist' or 'blacklist'.
      * @return void
      */
-    public function setConstantBehaviour(string $type) {
+    public function setConstantBehaviour(string $type)
+    {
         $this->constantSettings['behaviour'] = $type;
     }
 
@@ -62,7 +67,8 @@ class LanguageRunner {
      * @param string $name Constant name.
      * @return boolean true if settings allow access, false otherwise.
      */
-    public function canAccessConstant(string $name) {
+    public function canAccessConstant(string $name)
+    {
         if (!isset($this->constantSettings['behaviour'])) {
             return true;
         }
@@ -75,16 +81,16 @@ class LanguageRunner {
     }
 
     /**
-     * Set the code to be executed. Parses the code. 
+     * Set the code to be executed. Parses the code.
      *
      * @param string $code Code to be executed.
      * @throws Error in case of parsing errors.
      * @return void
      */
-    public function setCode(string $code) {
+    public function setCode(string $code)
+    {
         $this->code = '<?php ' . $code;
         $this->ast = $this->parser->parse($this->code);
-        
     }
 
     /**
@@ -93,17 +99,19 @@ class LanguageRunner {
      * @param array $vars Array of variables. Array keys are variable names.
      * @return void
      */
-    public function setVars(array $vars) {
+    public function setVars(array $vars)
+    {
         $this->vars = $vars;
     }
-    
+
     /**
      * Dump the parsed AST to stdout.
      *
      * @return void
      */
-    public function dumpAst() {
-        $dumper = new NodeDumper;
+    public function dumpAst()
+    {
+        $dumper = new NodeDumper();
         echo $dumper->dump($this->ast);
     }
 
@@ -112,8 +120,9 @@ class LanguageRunner {
      *
      * @return void
      */
-    public function evaluate() {
-        $traverser = new NodeTraverser;
+    public function evaluate()
+    {
+        $traverser = new NodeTraverser();
         $this->evaluator = new Evaluator($this->vars, $this);
         $traverser->addVisitor($this->evaluator);
         $traverser->traverse($this->ast);
@@ -124,7 +133,8 @@ class LanguageRunner {
      *
      * @return array Variables defined in the VM. Keys are variable names, values are variable values.
      */
-    public function getVars() {
+    public function getVars()
+    {
         return $this->vars;
     }
 }

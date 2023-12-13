@@ -78,7 +78,7 @@ class Evaluator extends NodeVisitorAbstract
     /**
      * The language runner that called the evaluator.
      */
-    private LanguageRunner $lr;
+    private LanguageRunner $languageRunner;
 
     /**
      * Callbacks to run for available functions.
@@ -94,11 +94,11 @@ class Evaluator extends NodeVisitorAbstract
      *
      * @param array $_vars Variables to initialize. Array keys are variable names, values are values.
      */
-    public function __construct(array $_vars, LanguageRunner $_lr)
+    public function __construct(array $_vars, LanguageRunner $_languageRunner)
     {
         $this->vars = $_vars; // Initialize the variables to passed variables.
         $this->stack = []; // Initialize the empty stack.
-        $this->lr = $_lr; // Remember the language runner.
+        $this->languageRunner = $_languageRunner; // Remember the language runner.
     }
 
     /**
@@ -128,58 +128,60 @@ class Evaluator extends NodeVisitorAbstract
         // On every if and elseif node that's not skipped (there haven't been any true conditions in the block previously)
         // we set a 'condTruthy' attribute to indicate what does the condition evaluate to.
 
-        $parent = $node->getAttribute('parentIf');
-        $parentElif = $node->getAttribute('parentElseif');
+        $parentIf = $node->getAttribute('parentIf');
+        $parentElseif = $node->getAttribute('parentElseif');
         $parentTernary = $node->getAttribute('parentTernary');
 
         // Check whether we should ignore this node / its children.
-        if ($parentElif) { // Is this node a direct descendant (statement or condition) of an elseif block?
+        if ($parentElseif) { // Is this node a direct descendant (statement or condition) of an elseif block?
             // If yes, then it's also a descentant of an If statement.
 
-            if ($parent->getAttribute('condTruthy')) { // Is the condition of the If block true?
-                return NodeTraverser::DONT_TRAVERSE_CHILDREN; // Don't evaluate this node and its children.
+            if ($parentIf->getAttribute('condTruthy')) { // Is the condition of the If block true?
+                return NodeTraverser::DONT_TRAVERSE_CHILDREN; // Don't evaluate this node nor its children.
             }
 
             // Have we already evaluated an elseif statement? I.e., has there been a true elseif prior to this one in the block?
-            if ($parent->getAttribute('hasEvaluatedElifs') === true) {
-                return NodeTraverser::DONT_TRAVERSE_CHILDREN; // Don't evaluate this node and its children.
+            if ($parentIf->getAttribute('hasEvaluatedElifs') === true) {
+                return NodeTraverser::DONT_TRAVERSE_CHILDREN; // Don't evaluate this node nor its children.
             }
 
             // Otherwise, what's the relationship between this node and its parent elseif?
-            $elifRel = $node->getAttribute('parentElseifRelationship');
-            if ($elifRel === 'stmt' && $parentElif->getAttribute('condTruthy') == false) {
-                // If it's a statement of the elseif and the condition is false, don't evaluate this node and its children.
+            $parentElseifRelationship = $node->getAttribute('parentElseifRelationship');
+            if ($parentElseifRelationship === 'stmt' && $parentElseif->getAttribute('condTruthy') == false) {
+                // If it's a statement of the elseif and the condition is false, don't evaluate this node nor its children.
                 // In other words, skip the inner code in the elseif if the condition is false.
                 return NodeTraverser::DONT_TRAVERSE_CHILDREN;
             }
 
-            if ($parentElif->getAttribute('condTruthy')) {
+            if ($parentElseif->getAttribute('condTruthy')) {
                 // If the condition of this elseif is true, set context so other elseifs aren't evaluated.
-                $parent->setAttribute('hasEvaluatedElifs', true);
+                $parentIf->setAttribute('hasEvaluatedElifs', true);
             }
         }
 
         if ($parentTernary) { // Is this node part of a ternary?
-            $parentRel = $node->getAttribute('parentTernaryRelationship'); // What's the relationship to the ternary?
+            $parentRelationship = $node->getAttribute('parentTernaryRelationship'); // What's the relationship to the ternary?
             if ($parentTernary->getAttribute('condTruthy')) { // Is the parent ternary true?
-                if ($parentRel === 'else') { // If so, if this is the 'false' part of the ternary, skip it.
+                if ($parentRelationship === 'else') { // If so, if this is the 'false' part of the ternary, skip it.
                     return NodeTraverser::DONT_TRAVERSE_CHILDREN;
                 }
             } else {
-                if ($parentRel === 'if') { // If the parent ternary is false, and this is the 'true' part of the ternary, skip it.
+                if ($parentRelationship === 'if') { // If the parent ternary is false, and this is the 'true' part of the ternary, skip it.
                     return NodeTraverser::DONT_TRAVERSE_CHILDREN;
                 }
             }
         }
 
-        if ($parent) { // Is this node part of an if?
+        if ($parentIf) { // Is this node part of an If?
             if (
-                $parent->getAttribute('condTruthy') == false
+                $parentIf->getAttribute('condTruthy') == false
                 && $node->getAttribute('parentRelationship') === 'stmt'
             ) { // If the if condition is false and this node is a statement of the if, skip it.
                 return NodeTraverser::DONT_TRAVERSE_CHILDREN;
             }
         }
+
+
 
         // Start evaluating nodes.
 
@@ -215,27 +217,27 @@ class Evaluator extends NodeVisitorAbstract
         }
 
         if ($node instanceof ElseIf_) {
-            if ($parent->getAttribute('hasEvaluatedElifs')) {
+            if ($parentIf->getAttribute('hasEvaluatedElifs')) {
                 return NodeTraverser::DONT_TRAVERSE_CHILDREN;
             }
 
-            $node->cond->setAttribute('parentIf', $parent);
+            $node->cond->setAttribute('parentIf', $parentIf);
             $node->cond->setAttribute('parentElseif', $node);
             $node->cond->setAttribute('parentElseifRelationship', 'cond');
 
             foreach ($node->stmts as $stmt) {
-                $stmt->setAttribute('parentIf', $parent);
+                $stmt->setAttribute('parentIf', $parentIf);
                 $stmt->setAttribute('parentElseif', $node);
                 $stmt->setAttribute('parentElseifRelationship', 'stmt');
             }
         }
 
         if ($node instanceof Else_) {
-            if ($parent->getAttribute('condTruthy') == true) {
+            if ($parentIf->getAttribute('condTruthy') == true) {
                 return NodeTraverser::DONT_TRAVERSE_CHILDREN;
             }
 
-            if ($parent->getAttribute('hasEvaluatedElifs') == true) {
+            if ($parentIf->getAttribute('hasEvaluatedElifs') == true) {
                 return NodeTraverser::DONT_TRAVERSE_CHILDREN;
             }
         }
@@ -249,6 +251,8 @@ class Evaluator extends NodeVisitorAbstract
             $node->else->setAttribute('parentTernaryRelationship', 'else');
         }
     }
+
+
 
     /**
      * Leave a node from the AST and do everything we need when leaving that particular type of node.
@@ -324,7 +328,7 @@ class Evaluator extends NodeVisitorAbstract
             $this->stack[] = +$t;
         } elseif ($node instanceof ConstFetch) {
             $constfqn = Helpers::getFqnFromParts($node->name->parts);
-            if (!$this->lr->canAccessConstant($constfqn)) { // Ask the language runner whether we can pass the constant.
+            if (!$this->languageRunner->canAccessConstant($constfqn)) { // Ask the language runner whether we can pass the constant.
                 throw new UndeclaredVariableUsageException("Tried to get the value of disallowed constant {$constfqn}");
             }
             try {
@@ -378,8 +382,8 @@ class Evaluator extends NodeVisitorAbstract
             }
         }
 
-        if ($parent = $node->getAttribute('parentIf')) { // Is this node a direct descentant of an if?
-            if ($node->getAttribute('parentRelationship') === 'cond') { // Is this node the condition of an if?
+        if ($parent = $node->getAttribute('parentIf')) { // Is this node a direct descentant of an If?
+            if ($node->getAttribute('parentRelationship') === 'cond') { // Is this node the condition of an If?
                 // Push the evaluation to the parent if.
                 $parent->setAttribute('condTruthy', Helpers::arrayEnd($this->stack));
             }
@@ -395,7 +399,6 @@ class Evaluator extends NodeVisitorAbstract
 
     public function afterTraverse(array $nodes)
     {
-        $this->lr->setVars($this->vars);
-        //var_dump($this->vars);
+        $this->languageRunner->setVars($this->vars);
     }
 }
