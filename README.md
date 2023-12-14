@@ -62,7 +62,7 @@ Whitelist example:
 $lr = new LanguageRunner;
 $lr->setCode('$a = DB_USER;');
 $lr->setVars([]);
-$lr->setDisallowedConstants(['true', 'false']);
+$lr->setAllowedConstants(['true', 'false']);
 // IMPORTANT: IF YOU DO NOT SET CONSTANT BEHAVIOUR ALL CONSTANTS ARE ALLOWED!
 $lr->setConstantBehaviour('whitelist');
 // throws FormsComputedLanguage\Exceptions\UndeclaredVariableUsageException
