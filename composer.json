@@ -1,0 +1,26 @@
+{
+    "name": "webadminsib/forms-computed-language",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "FormsComputedLanguage\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Mario Borna Mjertan",
+            "email": "marioborna.mjertan@infobip.com"
+        }
+    ],
+    "require": {
+        "nikic/php-parser": "^4.17"
+    },
+    "require-dev": {
+        "pestphp/pest": "^2.28"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
