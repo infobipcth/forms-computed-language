@@ -337,7 +337,12 @@ class Evaluator extends NodeVisitorAbstract
                 throw new UndeclaredVariableUsageException("Tried to get the value of undefined constant {$constfqn}");
             }
         } elseif ($node instanceof FuncCall) {
-            $functionName = $node->name->getParts()[0];
+            if (!empty((string) $node->name)) {
+                $functionName = (string)($node->name);
+            }
+            else {
+                $functionName = $node->name->getParts()[0];
+            }
             $argv = [];
             foreach ($node->args as $arg) {
                 $argv[] = array_pop($this->stack);
