@@ -263,8 +263,6 @@ class Evaluator extends NodeVisitorAbstract
         }
     }
 
-
-
     /**
      * Leave a node from the AST and do everything we need when leaving that particular type of node.
      * Most evaluation logic happens here, as the results of child block evaluations are now known and can be used
@@ -371,7 +369,7 @@ class Evaluator extends NodeVisitorAbstract
             $this->stack[] = !$temp;
         } elseif ($node instanceof ArrayItem) {
             $arrayItemValue = array_pop($this->stack);
-            if ($node->key ?? false) {
+            if ($node?->key) {
                 $arrayItemKey = array_pop($this->stack);
             }
             $arrayItem = new StackObjectsArrayItem($arrayItemKey, $arrayItemValue);
@@ -381,15 +379,13 @@ class Evaluator extends NodeVisitorAbstract
             $array = [];
             for ($i = $arraySize - 1; $i >= 0; $i--) {
                 $arrayItem = array_pop($this->stack);
-                if ($arrayItem->key ?? false) {
-                    var_dump($arrayItem);
+                if ($arrayItem?->key) {
                     $array[$arrayItem->key] = $arrayItem->value;
-                }
-                else {
+                } else {
                     $array[$i] = $arrayItem->value;
                 }
             }
-            $this->stack[] = ($array);
+            $this->stack[] = array_reverse($array);
         } elseif (
             $node instanceof Variable
             || $node instanceof Scalar
