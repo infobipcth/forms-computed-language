@@ -13,9 +13,12 @@ use FormsComputedLanguage\Exceptions\UnknownTokenException;
 use FormsComputedLanguage\Functions\CountSelectedItems;
 use FormsComputedLanguage\Functions\Round;
 use FormsComputedLanguage\Functions\IsSelected;
+use FormsComputedLanguage\StackObjects\ArrayItem as StackObjectsArrayItem;
 // Node types from php-parser
 use PhpParser\Node;
 use PhpParser\Node\Arg;
+use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\ArrayItem;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\AssignOp;
 use PhpParser\Node\Expr\AssignOp\Concat as AssignOpConcat;
@@ -111,6 +114,14 @@ class Evaluator extends NodeVisitorAbstract
      */
     public function enterNode(Node $node)
     {
+        if (getenv("FCL_DEBUG") === "debug") {
+            echo "Entering node\n";
+            var_dump(get_class($node));
+            echo "Variable store:\n";
+            var_dump($this->vars);
+            echo "Stack: \n";
+            var_dump($this->stack);
+        }
 
         // If this node is part of an if/elseif/else block, we need to be careful:
         // the 'if' condition should be evaluated always; 'elseif' conditions should be
@@ -358,6 +369,27 @@ class Evaluator extends NodeVisitorAbstract
         } elseif ($node instanceof BooleanNot) {
             $temp = array_pop($this->stack);
             $this->stack[] = !$temp;
+        } elseif ($node instanceof ArrayItem) {
+            $arrayItemValue = array_pop($this->stack);
+            if ($node->key ?? false) {
+                $arrayItemKey = array_pop($this->stack);
+            }
+            $arrayItem = new StackObjectsArrayItem($arrayItemKey, $arrayItemValue);
+            $this->stack[] = $arrayItem;
+        } elseif ($node instanceof Array_) {
+            $arraySize = count($node->items);
+            $array = [];
+            for ($i = $arraySize - 1; $i >= 0; $i--) {
+                $arrayItem = array_pop($this->stack);
+                if ($arrayItem->key ?? false) {
+                    var_dump($arrayItem);
+                    $array[$arrayItem->key] = $arrayItem->value;
+                }
+                else {
+                    $array[$i] = $arrayItem->value;
+                }
+            }
+            $this->stack[] = ($array);
         } elseif (
             $node instanceof Variable
             || $node instanceof Scalar
@@ -399,6 +431,15 @@ class Evaluator extends NodeVisitorAbstract
                 // Push the evaluation to the parent ternary node.
                 $parentTernary->setAttribute('condTruthy', Helpers::arrayEnd($this->stack));
             }
+        }
+
+        if (getenv("FCL_DEBUG") === "debug") {
+            echo "Leaving node\n";
+            var_dump(get_class($node));
+            echo "Variable store:\n";
+            var_dump($this->vars);
+            echo "Stack: \n";
+            var_dump($this->stack);
         }
     }
 
