@@ -4,8 +4,22 @@ use FormsComputedLanguage\LanguageRunner;
 
 test('initializing an array works', function () {
     $lr = new LanguageRunner;
-    $lr->setCode('$a = [3, 1, 4];');
+    $code = <<<'CODE'
+    $a = ['a' => 17, 'b' => 3, 98, 'some string'];
+CODE;
+    $lr->setCode("$code");
     $lr->setVars([]);
     $lr->evaluate();
-    expect($lr->getVars())->toBe(['a' => [3, 1, 4]]);
+    expect($lr->getVars())->toBe(['a' => ['a' => 17, 'b' => 3, 98, 'some string']]);
+});
+
+test('initializing another array works', function () {
+    $lr = new LanguageRunner;
+    $code = <<<'CODE'
+    $a = ['a' => 17, 'b' => 3, 98, 'some string', 'c' => ['a' => 17, 'b' => 3, 98, 'some string']];
+CODE;
+    $lr->setCode("$code");
+    $lr->setVars([]);
+    $lr->evaluate();
+    expect($lr->getVars())->toBe(['a' => ['a' => 17, 'b' => 3, 98, 'some string', 'c' => ['a' => 17, 'b' => 3, 98, 'some string']]]);
 });
