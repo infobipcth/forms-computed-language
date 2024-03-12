@@ -274,14 +274,14 @@ class Evaluator extends NodeVisitorAbstract
 
         if ($node instanceof ArrayDimFetch) {
             $node->var->setAttribute('parentIsAssignment', $node->getAttribute('parentIsAssignment', false));
-            //$node->dim->setAttribute('parentIsAssignment', $node->getAttribute('parentIsAssignment', false));
         }
 
         if ($node instanceof Foreach_) {
             $iteratedArray = $this->vars[$node->expr->name] ?? [];
             foreach ($iteratedArray as $iterationKey => $iterationValue) {
                 $isolatedLoopContextTraverser = new NodeTraverser();
-                $mockedLr = new LanguageRunner; // todo: configuration inheritance
+                $mockedLr = new LanguageRunner;
+                $mockedLr->setConstantSettings($this->languageRunner->getConstantBehaviour());
                 $iterationVars = [
                     ...$this->vars, 
                     $node->keyVar->name => $iterationKey,
