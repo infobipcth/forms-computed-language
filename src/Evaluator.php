@@ -284,9 +284,13 @@ class Evaluator extends NodeVisitorAbstract
                 $mockedLr->setConstantSettings($this->languageRunner->getConstantBehaviour());
                 $iterationVars = [
                     ...$this->vars, 
-                    $node->keyVar->name => $iterationKey,
-                    $node->valueVar->name => $iterationValue
                 ];
+                if ($node?->keyVar ?? false) {
+                    $iterationVars[$node->keyVar?->name] = $iterationKey;
+                }
+                if ($node?->valueVar ?? false) {
+                    $iterationVars[$node->valueVar?->name] = $iterationValue;
+                }
                 $isolatedLoopContextEvaluator = new Evaluator($iterationVars, $mockedLr);
                 $isolatedLoopContextTraverser->addVisitor($isolatedLoopContextEvaluator);
                 $isolatedLoopContextTraverser->traverse($node->stmts);
