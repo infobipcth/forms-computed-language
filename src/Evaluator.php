@@ -285,10 +285,10 @@ class Evaluator extends NodeVisitorAbstract
                 $iterationVars = [
                     ...$this->vars, 
                 ];
-                if ($node?->keyVar ?? false) {
+                if ($node?->keyVar) {
                     $iterationVars[$node->keyVar?->name] = $iterationKey;
                 }
-                if ($node?->valueVar ?? false) {
+                if ($node?->valueVar) {
                     $iterationVars[$node->valueVar?->name] = $iterationValue;
                 }
                 $isolatedLoopContextEvaluator = new Evaluator($iterationVars, $mockedLr);
@@ -297,7 +297,7 @@ class Evaluator extends NodeVisitorAbstract
                 $afterIterationVars = $mockedLr->getVars();
                 $this->vars = $afterIterationVars;
             }
-            unset($this->vars[$node->keyVar->name], $this->vars[$node->valueVar->name]);
+            unset($this->vars[$node->keyVar?->name], $this->vars[$node->valueVar?->name]);
             return NodeTraverser::DONT_TRAVERSE_CHILDREN;
         }
     }
