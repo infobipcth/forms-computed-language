@@ -13,9 +13,13 @@ use FormsComputedLanguage\Exceptions\UnknownTokenException;
 use FormsComputedLanguage\Functions\CountSelectedItems;
 use FormsComputedLanguage\Functions\Round;
 use FormsComputedLanguage\Functions\IsSelected;
+use FormsComputedLanguage\StackObjects\ArrayItem as StackObjectsArrayItem;
 // Node types from php-parser
 use PhpParser\Node;
 use PhpParser\Node\Arg;
+use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Expr\ArrayDimFetch;
+use PhpParser\Node\Expr\ArrayItem;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\AssignOp;
 use PhpParser\Node\Expr\AssignOp\Concat as AssignOpConcat;
@@ -49,6 +53,7 @@ use PhpParser\Node\Scalar;
 use PhpParser\Node\Stmt\Else_;
 use PhpParser\Node\Stmt\ElseIf_;
 use PhpParser\Node\Stmt\Expression;
+use PhpParser\Node\Stmt\Foreach_;
 use PhpParser\Node\Stmt\If_;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
@@ -111,6 +116,14 @@ class Evaluator extends NodeVisitorAbstract
      */
     public function enterNode(Node $node)
     {
+        if (getenv("FCL_DEBUG") === "debug") {
+            echo "Entering node\n";
+            var_dump(get_class($node));
+            echo "Variable store:\n";
+            var_dump($this->vars);
+            echo "Stack: \n";
+            var_dump($this->stack);
+        }
 
         // If this node is part of an if/elseif/else block, we need to be careful:
         // the 'if' condition should be evaluated always; 'elseif' conditions should be
@@ -181,8 +194,6 @@ class Evaluator extends NodeVisitorAbstract
             }
         }
 
-
-
         // Start evaluating nodes.
 
         if ($node instanceof Scalar) { // If this node is a scalar, push its value to the stack.
@@ -190,7 +201,12 @@ class Evaluator extends NodeVisitorAbstract
         }
 
         if ($node instanceof Variable) { // If this node references a variable e.g. $x, push the variable value to the stack.
-            $this->stack[] = $this->vars[$node->name] ?? null;
+            if (!($node->getAttribute('parentIsAssignment', false))) {
+                $this->stack[] = $this->vars[$node->name] ?? null;
+            }
+            else {
+                $this->stack[] = $node->name ?? null;
+            }
         }
 
         // Set up relationships and references for children of If, Elseif, Else blocks and ternary operators.
@@ -250,9 +266,41 @@ class Evaluator extends NodeVisitorAbstract
             $node->else->setAttribute('parentTernary', $node);
             $node->else->setAttribute('parentTernaryRelationship', 'else');
         }
+
+        if ($node instanceof Assign) {
+            $node->var->setAttribute('parentIsAssignment', true);
+            $node->var->setAttribute('parentAssign', $node);
+        }
+
+        if ($node instanceof ArrayDimFetch) {
+            $node->var->setAttribute('parentIsAssignment', $node->getAttribute('parentIsAssignment', false));
+        }
+
+        if ($node instanceof Foreach_) {
+            $iteratedArray = $this->vars[$node->expr->name] ?? [];
+            foreach ($iteratedArray as $iterationKey => $iterationValue) {
+                $isolatedLoopContextTraverser = new NodeTraverser();
+                $mockedLr = new LanguageRunner;
+                $mockedLr->setConstantSettings($this->languageRunner->getConstantBehaviour());
+                $iterationVars = [
+                    ...$this->vars, 
+                ];
+                if ($node?->keyVar) {
+                    $iterationVars[$node->keyVar?->name] = $iterationKey;
+                }
+                if ($node?->valueVar) {
+                    $iterationVars[$node->valueVar?->name] = $iterationValue;
+                }
+                $isolatedLoopContextEvaluator = new Evaluator($iterationVars, $mockedLr);
+                $isolatedLoopContextTraverser->addVisitor($isolatedLoopContextEvaluator);
+                $isolatedLoopContextTraverser->traverse($node->stmts);
+                $afterIterationVars = $mockedLr->getVars();
+                $this->vars = $afterIterationVars;
+            }
+            unset($this->vars[$node->keyVar?->name], $this->vars[$node->valueVar?->name]);
+            return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+        }
     }
-
-
 
     /**
      * Leave a node from the AST and do everything we need when leaving that particular type of node.
@@ -272,7 +320,29 @@ class Evaluator extends NodeVisitorAbstract
         $nodeType = get_class($node);
 
         if ($node instanceof Assign) {
-            $this->vars[$node->var->name] = array_pop($this->stack);
+            if ($node->getAttribute('isArrayAssignment', false)) {
+                $dimensional = $node->getAttribute('isArrayAssignmentByDim', false);
+                $value = array_pop($this->stack);
+                if ($dimensional) {
+                    $dim = array_pop($this->stack);
+                }
+                $name = array_pop($this->stack);
+                if (!$dimensional) {
+                    $this->vars[$name][] = $value;
+                }
+                else {
+                    $this->vars[$name][$dim] = $value;
+                }
+            } else {
+                if (!($node->dim ?? false)) {
+                    $this->vars[$node->var->name] = array_pop($this->stack);
+                }
+                else {
+                    $arrayDim = array_pop($this->stack);
+                    $arrayVal = array_pop($this->stack);
+                    $this->vars[$node->var->name][$arrayDim] = $arrayVal;
+                }
+            }
         } elseif ($node instanceof AssignOp) {
             if ($node instanceof AssignOpPlus) {
                 $this->vars[$node->var->name] += array_pop($this->stack);
@@ -358,6 +428,43 @@ class Evaluator extends NodeVisitorAbstract
         } elseif ($node instanceof BooleanNot) {
             $temp = array_pop($this->stack);
             $this->stack[] = !$temp;
+        } elseif ($node instanceof ArrayItem) {
+            $arrayItemValue = array_pop($this->stack);
+            if ($node?->key) {
+                $arrayItemKey = array_pop($this->stack);
+            }
+            $arrayItem = new StackObjectsArrayItem($arrayItemKey ?? null, $arrayItemValue);
+            $this->stack[] = $arrayItem;
+        } elseif ($node instanceof Array_) {
+            $arraySize = count($node->items);
+            $array = [];
+            for ($i = $arraySize - 1; $i >= 0; $i--) {
+                $arrayItem = array_pop($this->stack);
+                if ($arrayItem?->key) {
+                    $array[$arrayItem->key] = $arrayItem->value;
+                } else {
+                    $array[$i] = $arrayItem->value;
+                }
+            }
+            $this->stack[] = array_reverse($array);
+        } elseif ($node instanceof ArrayDimFetch) {
+            if (!($node->getAttribute('parentIsAssignment', false))) {
+                $arrayDim = array_pop($this->stack);
+                $array = array_pop($this->stack);
+                $this->stack[] = $array[$arrayDim];
+            }
+            else {
+                $assignmentNode = $node->getAttribute('parentAssign');
+                $assignmentNode->setAttribute('isArrayAssignment', true);
+                if ($node->dim ?? false) {
+                    $assignmentNode->setAttribute('isArrayAssignmentByDim', true);
+                    $arrayDim = array_pop($this->stack);
+                    $this->stack[] = $arrayDim;
+                } 
+                $arrayName = array_pop($this->stack);
+                $this->stack[] = $arrayName;
+                
+            }
         } elseif (
             $node instanceof Variable
             || $node instanceof Scalar
@@ -368,6 +475,7 @@ class Evaluator extends NodeVisitorAbstract
             || $node instanceof Name
             || $node instanceof Arg
             || $node instanceof Expression
+            || $node instanceof Foreach_
         ) {
             // Don't throw an UnknownTokenException for nodes we consider in enterNode or that are 'wrapper' nodes,
             // such as Expression, Arg, Name etc.
@@ -399,6 +507,15 @@ class Evaluator extends NodeVisitorAbstract
                 // Push the evaluation to the parent ternary node.
                 $parentTernary->setAttribute('condTruthy', Helpers::arrayEnd($this->stack));
             }
+        }
+
+        if (getenv("FCL_DEBUG") === "debug") {
+            echo "Leaving node\n";
+            var_dump(get_class($node));
+            echo "Variable store:\n";
+            var_dump($this->vars);
+            echo "Stack: \n";
+            var_dump($this->stack);
         }
     }
 

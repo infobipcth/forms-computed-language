@@ -137,4 +137,23 @@ class LanguageRunner
     {
         return $this->vars;
     }
+
+    /**
+     * Get the constant behaviour settings.
+     * 
+     * @return array Constant behaviour settings.
+     */
+    public function getConstantBehaviour() {
+        return $this->constantSettings ?? [];
+    }
+
+    /**
+     * Set the constant behaviour settings. Dangerous: only call when bootstrapping a context-isolated language runner.
+     * 
+     * @param array $constantSettings The constant settings array.
+     * @return array Constant behaviour settings.
+     */
+    public function setConstantSettings(array $constantSettings) {
+        $this->constantSettings = $constantSettings;
+    }
 }
