@@ -25,7 +25,7 @@ class LanguageRunner
      */
     public function __construct()
     {
-        $this->parser = (new ParserFactory())->create(1);
+        $this->parser = (new ParserFactory())->create(3);
     }
 
     /**
