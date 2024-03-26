@@ -1,35 +1,31 @@
 <?php
 
-use FormsComputedLanguage\LanguageRunner;
+namespace Tests\Unit;
 
 test('if works', function () {
-    $lr = new LanguageRunner;
-    $lr->setCode('if (true) { $a = 3.14; } elseif (true) { $a = 3.0; } else { $b = 2; }');
-    $lr->setVars([]);
-    $lr->evaluate();
-    expect($lr->getVars())->toBe(['a' => 3.14]);
+    $this->languageRunner->setCode('if (true) { $a = 3.14; } elseif (true) { $a = 3.0; } else { $b = 2; }');
+    $this->languageRunner->setVars([]);
+    $this->languageRunner->evaluate();
+    expect($this->languageRunner->getVars())->toBe(['a' => 3.14]);
 });
 
 test('elseif works', function () {
-    $lr = new LanguageRunner;
-    $lr->setCode('if (false) { $a = 3.14; } elseif (true) { $a = 3.0; } else { $b = 2; }');
-    $lr->setVars([]);
-    $lr->evaluate();
-    expect($lr->getVars())->toBe(['a' => 3.0]);
+    $this->languageRunner->setCode('if (false) { $a = 3.14; } elseif (true) { $a = 3.0; } else { $b = 2; }');
+    $this->languageRunner->setVars([]);
+    $this->languageRunner->evaluate();
+    expect($this->languageRunner->getVars())->toBe(['a' => 3.0]);
 });
 
 test('else works', function () {
-    $lr = new LanguageRunner;
-    $lr->setCode('if (false) { $a = 3.14; } elseif (false) { $a = 3.0; } else { $b = 2; }');
-    $lr->setVars([]);
-    $lr->evaluate();
-    expect($lr->getVars())->toBe(['b' => 2]);
+    $this->languageRunner->setCode('if (false) { $a = 3.14; } elseif (false) { $a = 3.0; } else { $b = 2; }');
+    $this->languageRunner->setVars([]);
+    $this->languageRunner->evaluate();
+    expect($this->languageRunner->getVars())->toBe(['b' => 2]);
 });
 
 test('only the first valid elseif is executed', function() {
-    $lr = new LanguageRunner;
-    $lr->setVars([]);
-    $lr->setCode(<<<'CODE'
+    $this->languageRunner->setVars([]);
+    $this->languageRunner->setCode(<<<'CODE'
     $a = 3; $b = 4; $c = -7; $d = 2;
     if ($a < 0) {
         $a = $a * -1;
@@ -47,8 +43,8 @@ test('only the first valid elseif is executed', function() {
         $d = 2000;
     }
     CODE);
-    $lr->evaluate();
-    expect($lr->getVars())->toBe([
+    $this->languageRunner->evaluate();
+    expect($this->languageRunner->getVars())->toBe([
         'a' => 3,
         'b' => 4,
         'c' => 7,
