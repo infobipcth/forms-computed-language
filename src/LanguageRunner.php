@@ -10,7 +10,7 @@ use PhpParser\ParserFactory;
 /**
  * Boots and shuts down the evaluator.
  */
-class LanguageRunner
+class LanguageRunner implements LanguageRunnerInterface
 {
     private $parser;
     private $code;
