@@ -1,5 +1,5 @@
 {
-    "name": "webadminsib/forms-computed-language",
+    "name": "infobipcth/forms-computed-language",
     "type": "project",
     "autoload": {
         "psr-4": {
