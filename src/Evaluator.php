@@ -280,7 +280,7 @@ class Evaluator extends NodeVisitorAbstract
             $iteratedArray = $this->vars[$node->expr->name] ?? [];
             foreach ($iteratedArray as $iterationKey => $iterationValue) {
                 $isolatedLoopContextTraverser = new NodeTraverser();
-                $mockedLr = LanguageRunnerFactory::create();
+                $mockedLr = LanguageRunner::getInstance();
                 $mockedLr->setConstantSettings($this->languageRunner->getConstantBehaviour());
                 $iterationVars = [
                     ...$this->vars, 
