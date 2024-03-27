@@ -1,8 +1,8 @@
 <?php
 
-use FormsComputedLanguage\LanguageRunnerFactory;
+use FormsComputedLanguage\LanguageRunner;
 use PHPUnit\Framework\TestCase;
 
 uses(TestCase::class)->beforeEach(function() {
-    $this->languageRunner = LanguageRunnerFactory::create();
+    $this->languageRunner = LanguageRunner::getInstance();
 })->group('unit')->in('Unit');

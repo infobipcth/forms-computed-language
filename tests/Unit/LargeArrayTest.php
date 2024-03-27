@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Unit;
+
 test('Test that looping through large dataset works', function ($arrayData) {
     $code = <<<'CODE'
     if($region == 'Europe' && $numberOfMessages > 1000) {
