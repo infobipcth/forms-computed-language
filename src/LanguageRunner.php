@@ -19,13 +19,31 @@ class LanguageRunner
     private $traverser;
     private $evaluator;
     private $constantSettings;
+    private static $instances = [];
+
+    protected function __clone() {}
+
+    public function __wakeup()
+    {
+        throw new \Exception("Cannot unserialize a singleton.");
+    }
 
     /**
      * Construct the language runner. Initialize the parser.
      */
-    public function __construct()
+    protected function __construct()
     {
         $this->parser = (new ParserFactory())->create(3);
+    }
+
+    public static function getInstance(): LanguageRunner
+    {
+        $class = static::class;
+        if (!isset(self::$instances[$class])) {
+            self::$instances[$class] = new static();
+        }
+
+        return self::$instances[$class];
     }
 
     /**
