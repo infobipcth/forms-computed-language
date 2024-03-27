@@ -21,5 +21,5 @@ CODE;
     $this->languageRunner->evaluate();
 
     expect($this->languageRunner->getVars())->not->toBeEmpty();
-    expect($this->languageRunner->getVars())->toHaveKeys(['region', 'country', 'Number of messages', 'Traffic time', 'Number of sessions', 'es-form-skipped', 'SS_USD', 'SS_EUR', 'RawPricesSMSPrices']);
+    expect($this->languageRunner->getVars())->toHaveKeys(['result', 'arrayOut', 'region', 'country', 'Number of messages', 'Traffic time', 'Number of sessions', 'es-form-skipped', 'SS_USD', 'SS_EUR', 'RawPricesSMSPrices']);
 })->with('largeArray');
