@@ -8,35 +8,34 @@ use PhpParser\Node\Stmt\If_;
 
 class IfVisitor implements VisitorInterface
 {
+	public static function enterNode(Node &$node)
+	{
+		// Set up relationships and references for children of If, Elseif, Else blocks and ternary operators.
+		if ($node instanceof If_) {
+			if ($node->cond) {
+				$node->cond->setAttribute('parentIf', $node);
+				$node->cond->setAttribute('parentRelationship', 'cond');
+			}
 
-    static public function enterNode(Node &$node)
-    {
-        // Set up relationships and references for children of If, Elseif, Else blocks and ternary operators.
-        if ($node instanceof If_) {
-            if ($node->cond) {
-                $node->cond->setAttribute('parentIf', $node);
-                $node->cond->setAttribute('parentRelationship', 'cond');
-            }
+			foreach ($node->stmts ?? [] as $statement) {
+				$statement->setAttribute('parentIf', $node);
+				$statement->setAttribute('parentRelationship', 'stmt');
+			}
 
-            foreach ($node->stmts ?? [] as $statement) {
-                $statement->setAttribute('parentIf', $node);
-                $statement->setAttribute('parentRelationship', 'stmt');
-            }
+			foreach ($node->elseifs ?? [] as $elseif) {
+				$elseif->setAttribute('parentIf', $node);
+				$elseif->setAttribute('parentRelationship', 'elif');
+			}
 
-            foreach ($node->elseifs ?? [] as $elseif) {
-                $elseif->setAttribute('parentIf', $node);
-                $elseif->setAttribute('parentRelationship', 'elif');
-            }
+			if ($node->else) {
+				$node->else->setAttribute('parentIf', $node);
+				$node->else->setAttribute('parentRelationship', 'else');
+			}
+		}
+	}
 
-            if ($node->else) {
-                $node->else->setAttribute('parentIf', $node);
-                $node->else->setAttribute('parentRelationship', 'else');
-            }
-        }
-    }
-
-    static public function leaveNode(Node &$node)
-    {
-        // TODO: Implement leaveNode() method.
-    }
+	public static function leaveNode(Node &$node)
+	{
+		// TODO: Implement leaveNode() method.
+	}
 }

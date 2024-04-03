@@ -9,19 +9,18 @@ use PhpParser\Node;
 
 class ArrayItemVisitor implements VisitorInterface
 {
+	public static function enterNode(Node &$node)
+	{
+		// TODO: Implement enterNode() method.
+	}
 
-    static public function enterNode(Node &$node)
-    {
-        // TODO: Implement enterNode() method.
-    }
-
-    static public function leaveNode(Node &$node)
-    {
-        $arrayItemValue = Stack::pop();
-        if ($node?->key) {
-            $arrayItemKey = Stack::pop();
-        }
-        $arrayItem = new StackObjectsArrayItem($arrayItemKey ?? null, $arrayItemValue);
-        Stack::push($arrayItem);
-    }
+	public static function leaveNode(Node &$node)
+	{
+		$arrayItemValue = Stack::pop();
+		if ($node?->key) {
+			$arrayItemKey = Stack::pop();
+		}
+		$arrayItem = new StackObjectsArrayItem($arrayItemKey ?? null, $arrayItemValue);
+		Stack::push($arrayItem);
+	}
 }

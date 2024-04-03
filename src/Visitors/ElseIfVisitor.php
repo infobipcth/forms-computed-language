@@ -10,29 +10,28 @@ use PhpParser\NodeTraverser;
 
 class ElseIfVisitor implements VisitorInterface
 {
+	public static function enterNode(Node &$node)
+	{
+		$parentIf = $node->getAttribute('parentIf');
+		if ($node instanceof ElseIf_) {
+			if ($parentIf->getAttribute('hasEvaluatedElifs')) {
+				DontTraverseChildren::throw();
+			}
 
-    static public function enterNode(Node &$node)
-    {
-        $parentIf = $node->getAttribute('parentIf');
-        if ($node instanceof ElseIf_) {
-            if ($parentIf->getAttribute('hasEvaluatedElifs')) {
-                DontTraverseChildren::throw();
-            }
+			$node->cond->setAttribute('parentIf', $parentIf);
+			$node->cond->setAttribute('parentElseif', $node);
+			$node->cond->setAttribute('parentElseifRelationship', 'cond');
 
-            $node->cond->setAttribute('parentIf', $parentIf);
-            $node->cond->setAttribute('parentElseif', $node);
-            $node->cond->setAttribute('parentElseifRelationship', 'cond');
+			foreach ($node->stmts as $stmt) {
+				$stmt->setAttribute('parentIf', $parentIf);
+				$stmt->setAttribute('parentElseif', $node);
+				$stmt->setAttribute('parentElseifRelationship', 'stmt');
+			}
+		}
+	}
 
-            foreach ($node->stmts as $stmt) {
-                $stmt->setAttribute('parentIf', $parentIf);
-                $stmt->setAttribute('parentElseif', $node);
-                $stmt->setAttribute('parentElseifRelationship', 'stmt');
-            }
-        }
-    }
-
-    static public function leaveNode(Node &$node)
-    {
-        // TODO: Implement leaveNode() method.
-    }
+	public static function leaveNode(Node &$node)
+	{
+		// TODO: Implement leaveNode() method.
+	}
 }

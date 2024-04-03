@@ -15,28 +15,27 @@ use PhpParser\Node\Expr\AssignOp\Plus as AssignOpPlus;
 
 class AssignOpVisitor implements VisitorInterface
 {
+	public static function leaveNode(Node &$node)
+	{
+		$nodeType = get_class($node);
 
-    static public function leaveNode(Node &$node)
-    {
-        $nodeType = get_class($node);
+		if ($node instanceof AssignOpPlus) {
+			VariableStore::setVariable($node->var->name, VariableStore::getVariable($node->var->name) + Stack::pop());
+		} elseif ($node instanceof AssignOpMinus) {
+			VariableStore::setVariable($node->var->name, VariableStore::getVariable($node->var->name) - Stack::pop());
+		} elseif ($node instanceof AssignOpMul) {
+			VariableStore::setVariable($node->var->name, VariableStore::getVariable($node->var->name) * Stack::pop());
+		} elseif ($node instanceof AssignOpDiv) {
+			VariableStore::setVariable($node->var->name, VariableStore::getVariable($node->var->name) / Stack::pop());
+		} elseif ($node instanceof AssignOpConcat) {
+			VariableStore::setVariable($node->var->name, VariableStore::getVariable($node->var->name) . Stack::pop());
+		} else {
+			throw new UnknownTokenException("Unknown assignment operator {$nodeType} used");
+		}
+	}
 
-        if ($node instanceof AssignOpPlus) {
-            VariableStore::setVariable($node->var->name, VariableStore::getVariable($node->var->name) + Stack::pop());
-        } elseif ($node instanceof AssignOpMinus) {
-            VariableStore::setVariable($node->var->name, VariableStore::getVariable($node->var->name) - Stack::pop());
-        } elseif ($node instanceof AssignOpMul) {
-            VariableStore::setVariable($node->var->name, VariableStore::getVariable($node->var->name) * Stack::pop());
-        } elseif ($node instanceof AssignOpDiv) {
-            VariableStore::setVariable($node->var->name, VariableStore::getVariable($node->var->name) / Stack::pop());
-        } elseif ($node instanceof AssignOpConcat) {
-            VariableStore::setVariable($node->var->name, VariableStore::getVariable($node->var->name) . Stack::pop());
-        } else {
-            throw new UnknownTokenException("Unknown assignment operator {$nodeType} used");
-        }
-    }
-
-    static public function enterNode(Node &$node)
-    {
-        // empty.
-    }
+	public static function enterNode(Node &$node)
+	{
+		// empty.
+	}
 }

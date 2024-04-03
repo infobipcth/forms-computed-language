@@ -12,38 +12,37 @@ use PhpParser\Node;
 
 class FuncCallVisitor implements VisitorInterface
 {
-    /**
-     * Callbacks to run for available functions.
-     */
-    private const FUNCTION_CALLBACKS = [
-        'round' => [Round::class, 'run'],
-        'countSelectedItems' => [CountSelectedItems::class, 'run'],
-        'isSelected' => [IsSelected::class, 'run'],
-    ];
-    static public function enterNode(Node &$node)
-    {
-        // TODO: Implement enterNode() method.
-    }
+	/**
+	 * Callbacks to run for available functions.
+	 */
+	private const FUNCTION_CALLBACKS = [
+		'round' => [Round::class, 'run'],
+		'countSelectedItems' => [CountSelectedItems::class, 'run'],
+		'isSelected' => [IsSelected::class, 'run'],
+	];
+	public static function enterNode(Node &$node)
+	{
+		// TODO: Implement enterNode() method.
+	}
 
-    static public function leaveNode(Node &$node)
-    {
-        if (!empty((string) $node->name)) {
-            $functionName = (string)($node->name);
-        }
-        else {
-            $functionName = $node->name->getParts()[0];
-        }
-        $argv = [];
-        foreach ($node->args as $arg) {
-            $argv[] = Stack::pop();
-        }
+	public static function leaveNode(Node &$node)
+	{
+		if (!empty((string) $node->name)) {
+			$functionName = (string)($node->name);
+		} else {
+			$functionName = $node->name->getParts()[0];
+		}
+		$argv = [];
+		foreach ($node->args as $arg) {
+			$argv[] = Stack::pop();
+		}
 
-        $argv = array_reverse($argv);
+		$argv = array_reverse($argv);
 
-        if (!isset(self::FUNCTION_CALLBACKS[$functionName])) {
-            throw new UnknownFunctionException("Undefined function {$functionName} called");
-        }
+		if (!isset(self::FUNCTION_CALLBACKS[$functionName])) {
+			throw new UnknownFunctionException("Undefined function {$functionName} called");
+		}
 
-        Stack::push(call_user_func_array(self::FUNCTION_CALLBACKS[$functionName], [$argv]));
-    }
+		Stack::push(call_user_func_array(self::FUNCTION_CALLBACKS[$functionName], [$argv]));
+	}
 }

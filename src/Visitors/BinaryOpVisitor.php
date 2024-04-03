@@ -22,47 +22,46 @@ use PhpParser\Node\Expr\BinaryOp\SmallerOrEqual;
 
 class BinaryOpVisitor implements VisitorInterface
 {
+	public static function enterNode(Node &$node)
+	{
+		// TODO: Implement enterNode() method.
+	}
 
-    static public function enterNode(Node &$node)
-    {
-        // TODO: Implement enterNode() method.
-    }
+	public static function leaveNode(Node &$node)
+	{
+		$nodeType = get_class($node);
 
-    static public function leaveNode(Node &$node)
-    {
-        $nodeType = get_class($node);
+		$rhs = Stack::pop();
+		$lhs = Stack::pop();
 
-        $rhs = Stack::pop();
-        $lhs = Stack::pop();
-
-        if ($node instanceof Concat) {
-            Stack::push($lhs . $rhs);
-        } elseif ($node instanceof Plus) {
-            Stack::push($lhs + $rhs);
-        } elseif ($node instanceof Minus) {
-            Stack::push($lhs - $rhs);
-        } elseif ($node instanceof Mul) {
-            Stack::push($lhs * $rhs);
-        } elseif ($node instanceof Div) {
-            Stack::push($lhs / $rhs);
-        } elseif ($node instanceof Equal) {
-            Stack::push($lhs == $rhs);
-        } elseif ($node instanceof NotEqual) {
-            Stack::push($lhs != $rhs);
-        } elseif ($node instanceof Smaller) {
-            Stack::push($lhs < $rhs);
-        } elseif ($node instanceof SmallerOrEqual) {
-            Stack::push($lhs <= $rhs);
-        } elseif ($node instanceof Greater) {
-            Stack::push($lhs > $rhs);
-        } elseif ($node instanceof GreaterOrEqual) {
-            Stack::push($lhs >= $rhs);
-        } elseif ($node instanceof BooleanAnd) {
-            Stack::push(($lhs && $rhs));
-        } elseif ($node instanceof BooleanOr) {
-            Stack::push(($lhs || $rhs));
-        } else {
-            throw new UnknownTokenException("Unknown boolean operator {$nodeType} used");
-        }
-    }
+		if ($node instanceof Concat) {
+			Stack::push($lhs . $rhs);
+		} elseif ($node instanceof Plus) {
+			Stack::push($lhs + $rhs);
+		} elseif ($node instanceof Minus) {
+			Stack::push($lhs - $rhs);
+		} elseif ($node instanceof Mul) {
+			Stack::push($lhs * $rhs);
+		} elseif ($node instanceof Div) {
+			Stack::push($lhs / $rhs);
+		} elseif ($node instanceof Equal) {
+			Stack::push($lhs == $rhs);
+		} elseif ($node instanceof NotEqual) {
+			Stack::push($lhs != $rhs);
+		} elseif ($node instanceof Smaller) {
+			Stack::push($lhs < $rhs);
+		} elseif ($node instanceof SmallerOrEqual) {
+			Stack::push($lhs <= $rhs);
+		} elseif ($node instanceof Greater) {
+			Stack::push($lhs > $rhs);
+		} elseif ($node instanceof GreaterOrEqual) {
+			Stack::push($lhs >= $rhs);
+		} elseif ($node instanceof BooleanAnd) {
+			Stack::push(($lhs && $rhs));
+		} elseif ($node instanceof BooleanOr) {
+			Stack::push(($lhs || $rhs));
+		} else {
+			throw new UnknownTokenException("Unknown boolean operator {$nodeType} used");
+		}
+	}
 }
