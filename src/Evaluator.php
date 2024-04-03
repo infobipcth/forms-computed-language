@@ -4,19 +4,14 @@ namespace FormsComputedLanguage;
 
 // Imports for...
 // PHP errors
-use Error;
 // FCL errors
 use FormsComputedLanguage\Exceptions\UndeclaredVariableUsageException;
 use FormsComputedLanguage\Exceptions\UnknownFunctionException;
 use FormsComputedLanguage\Exceptions\UnknownTokenException;
 // FCL functions
-use FormsComputedLanguage\Functions\CountSelectedItems;
-use FormsComputedLanguage\Functions\Round;
-use FormsComputedLanguage\Functions\IsSelected;
 use FormsComputedLanguage\Lifecycle\Stack;
 use FormsComputedLanguage\Lifecycle\VariableStore;
-use FormsComputedLanguage\StackObjects\ArrayItem as StackObjectsArrayItem;
-// Node types from php-parser
+// FCL node visitors
 use FormsComputedLanguage\Visitors\ArrayDimFetchVisitor;
 use FormsComputedLanguage\Visitors\ArrayItemVisitor;
 use FormsComputedLanguage\Visitors\ArrayVisitor;
@@ -33,6 +28,7 @@ use FormsComputedLanguage\Visitors\IfVisitor;
 use FormsComputedLanguage\Visitors\ScalarVisitor;
 use FormsComputedLanguage\Visitors\TernaryVisitor;
 use FormsComputedLanguage\Visitors\VariableVisitor;
+// Node types from php-parser
 use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\Array_;
@@ -40,25 +36,7 @@ use PhpParser\Node\Expr\ArrayDimFetch;
 use PhpParser\Node\Expr\ArrayItem;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\AssignOp;
-use PhpParser\Node\Expr\AssignOp\Concat as AssignOpConcat;
-use PhpParser\Node\Expr\AssignOp\Div as AssignOpDiv;
-use PhpParser\Node\Expr\AssignOp\Minus as AssignOpMinus;
-use PhpParser\Node\Expr\AssignOp\Mul as AssignOpMul;
-use PhpParser\Node\Expr\AssignOp\Plus as AssignOpPlus;
 use PhpParser\Node\Expr\BinaryOp;
-use PhpParser\Node\Expr\BinaryOp\BooleanAnd;
-use PhpParser\Node\Expr\BinaryOp\BooleanOr;
-use PhpParser\Node\Expr\BinaryOp\Concat;
-use PhpParser\Node\Expr\BinaryOp\Div;
-use PhpParser\Node\Expr\BinaryOp\Equal;
-use PhpParser\Node\Expr\BinaryOp\Greater;
-use PhpParser\Node\Expr\BinaryOp\GreaterOrEqual;
-use PhpParser\Node\Expr\BinaryOp\Minus;
-use PhpParser\Node\Expr\BinaryOp\Mul;
-use PhpParser\Node\Expr\BinaryOp\NotEqual;
-use PhpParser\Node\Expr\BinaryOp\Plus;
-use PhpParser\Node\Expr\BinaryOp\Smaller;
-use PhpParser\Node\Expr\BinaryOp\SmallerOrEqual;
 use PhpParser\Node\Expr\BooleanNot;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Expr\FuncCall;
@@ -84,37 +62,10 @@ use PhpParser\NodeVisitorAbstract;
 class Evaluator extends NodeVisitorAbstract
 {
 	/**
-	 * Contains all declared variables and their values in any given point during the execution lifecycle.
-	 * Array keys are variable names, and values are variable values.
-	 *
-	 * @var array
+	 * Boot up the evaluator VM.
 	 */
-	private array $vars = [];
-
-	/**
-	 * The stack of the evaluator, used to memorize intermediate values during AST traversal.
-	 *
-	 * @var array
-	 */
-	private array $stack = [];
-
-	/**
-	 * The language runner that called the evaluator.
-	 */
-	private LanguageRunner $languageRunner;
-
-
-
-	/**
-	 * Boot up the evaluator VM. Sets initial variables and initializes an empty stack.
-	 *
-	 * @param array $_vars Variables to initialize. Array keys are variable names, values are values.
-	 */
-	public function __construct(LanguageRunner $_languageRunner)
+	public function __construct()
 	{
-		// $this->vars = $_vars; // Initialize the variables to passed variables.
-		//$this->stack = []; // Initialize the empty stack.
-		$this->languageRunner = $_languageRunner; // Remember the language runner.
 	}
 
 	/**
@@ -123,7 +74,10 @@ class Evaluator extends NodeVisitorAbstract
 	 * is mostly used to set up if/elseif/else relationships and to push variables to the stack.
 	 *
 	 * @param Node $node A node to enter.
-	 * @return void|int Returns void to continue, or a signal to the NodeTraverser class to skip traversing a part of the AST.
+	 * @return void|int Returns void to continue, or a signal to the NodeTraverser to skip traversing a part of the AST.
+	 * @noinspection PhpRedundantCatchClauseInspection
+	 * @noinspection PhpRedundantCatchClauseInspection
+	 * @noinspection PhpRedundantCatchClauseInspection
 	 */
 	public function enterNode(Node $node)
 	{
@@ -152,7 +106,8 @@ class Evaluator extends NodeVisitorAbstract
 		// We set a 'parentIf', 'parentElseif', 'parentTernary' attribute on the applicable child nodes with a reference
 		// to the parent node, and a 'parentIfRelationship' etc. attribute describing the relationship between the
 		// child and the parent.
-		// On every if and elseif node that's not skipped (there haven't been any true conditions in the block previously)
+		// On every if and elseif node that's not skipped
+		// (there haven't been any true conditions in the block previously)
 		// we set a 'condTruthy' attribute to indicate what does the condition evaluate to.
 
 		$parentIf = $node->getAttribute('parentIf');
@@ -167,15 +122,17 @@ class Evaluator extends NodeVisitorAbstract
 				return NodeTraverser::DONT_TRAVERSE_CHILDREN; // Don't evaluate this node nor its children.
 			}
 
-			// Have we already evaluated an elseif statement? I.e., has there been a true elseif prior to this one in the block?
+			// Have we already evaluated an elseif statement?
+			// I.e., has there been a true elseif prior to this one in the block?
 			if ($parentIf->getAttribute('hasEvaluatedElifs') === true) {
 				return NodeTraverser::DONT_TRAVERSE_CHILDREN; // Don't evaluate this node nor its children.
 			}
 
 			// Otherwise, what's the relationship between this node and its parent elseif?
 			$parentElseifRelationship = $node->getAttribute('parentElseifRelationship');
-			if ($parentElseifRelationship === 'stmt' && $parentElseif->getAttribute('condTruthy') == false) {
-				// If it's a statement of the elseif and the condition is false, don't evaluate this node nor its children.
+			if ($parentElseifRelationship === 'stmt' && !$parentElseif->getAttribute('condTruthy')) {
+				// If it's a statement of the elseif and the condition is false,
+				// don't evaluate this node nor its children.
 				// In other words, skip the inner code in the elseif if the condition is false.
 				return NodeTraverser::DONT_TRAVERSE_CHILDREN;
 			}
@@ -187,13 +144,15 @@ class Evaluator extends NodeVisitorAbstract
 		}
 
 		if ($parentTernary) { // Is this node part of a ternary?
-			$parentRelationship = $node->getAttribute('parentTernaryRelationship'); // What's the relationship to the ternary?
+			$parentRelationship = $node->getAttribute('parentTernaryRelationship');
+			// What's the relationship to the ternary?
 			if ($parentTernary->getAttribute('condTruthy')) { // Is the parent ternary true?
 				if ($parentRelationship === 'else') { // If so, if this is the 'false' part of the ternary, skip it.
 					return NodeTraverser::DONT_TRAVERSE_CHILDREN;
 				}
 			} else {
-				if ($parentRelationship === 'if') { // If the parent ternary is false, and this is the 'true' part of the ternary, skip it.
+				if ($parentRelationship === 'if') {
+					// If the parent ternary is false, and this is the 'true' part of the ternary, skip it.
 					return NodeTraverser::DONT_TRAVERSE_CHILDREN;
 				}
 			}
@@ -201,7 +160,7 @@ class Evaluator extends NodeVisitorAbstract
 
 		if ($parentIf) { // Is this node part of an If?
 			if (
-				$parentIf->getAttribute('condTruthy') == false
+				!$parentIf->getAttribute('condTruthy')
 				&& $node->getAttribute('parentRelationship') === 'stmt'
 			) { // If the if condition is false and this node is a statement of the if, skip it.
 				return NodeTraverser::DONT_TRAVERSE_CHILDREN;
@@ -322,7 +281,8 @@ class Evaluator extends NodeVisitorAbstract
 		// see comment in enterNode method.
 
 		if ($parentElseif = $node->getAttribute('parentElseif')) { // Is this node a direct descentant of an elseif?
-			if ($node->getAttribute('parentElseifRelationship') === 'cond') { // Is this node the condition of an elseif?
+			if ($node->getAttribute('parentElseifRelationship') === 'cond') {
+				// Is this node the condition of an elseif?
 				// If yes, its evaluation is on the top of the stack. We can push it up to the parent elseif,
 				// so statements inside it know whether to execute or not.
 				// Note that we are not popping the stack, simply looking at its top.
@@ -337,8 +297,10 @@ class Evaluator extends NodeVisitorAbstract
 			}
 		}
 
-		if ($parentTernary = $node->getAttribute('parentTernary')) { // Is this node a direct descendant of a ternary operator?
-			if ($node->getAttribute('parentTernaryRelationship') === 'cond') { // Is this node a condition of the ternary?
+		if ($parentTernary = $node->getAttribute('parentTernary')) {
+			// Is this node a direct descendant of a ternary operator?
+			if ($node->getAttribute('parentTernaryRelationship') === 'cond') {
+				// Is this node a condition of the ternary?
 				// Push the evaluation to the parent ternary node.
 				$parentTernary->setAttribute('condTruthy', Stack::peek());
 			}

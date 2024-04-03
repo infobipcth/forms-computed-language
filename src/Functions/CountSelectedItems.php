@@ -3,7 +3,6 @@
 namespace FormsComputedLanguage\Functions;
 
 use FormsComputedLanguage\Exceptions\ArgumentCountException;
-use FormsComputedLanguage\Exceptions\TypeException;
 
 /**
  * Implements the countSelectedItems() function.
@@ -23,7 +22,8 @@ class CountSelectedItems
 	{
 		$argc = (int)(count($args));
 		if ($argc <= 0 || $argc >= 2) {
-			throw new ArgumentCountException("the countSelectedItems() function called with {$argc} arguments, but has one required argument and no optional arguments");
+			throw new ArgumentCountException("the countSelectedItems() function called with {$argc} arguments,
+			but has one required argument and no optional arguments");
 		}
 		if (!is_array($args[0])) {
 			return 0;
