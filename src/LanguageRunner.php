@@ -139,7 +139,6 @@ class LanguageRunner implements LanguageRunnerInterface
         Harness::bootstrap(variables: $this->vars, _parser: $this->parser);
         $traverser = new NodeTraverser();
         self::$evaluator = new Evaluator($this);
-        //$this->evaluator->nt = $traverser;
         $traverser->addVisitor(self::$evaluator);
         $traverser->traverse($this->ast);
     }
@@ -160,6 +159,7 @@ class LanguageRunner implements LanguageRunnerInterface
 
     /**
      * Get the constant behaviour settings.
+     * @deprecated Use Harness::getConstantsConfiguration() instead.
      * 
      * @return array Constant behaviour settings.
      */
@@ -169,7 +169,7 @@ class LanguageRunner implements LanguageRunnerInterface
 
     /**
      * Set the constant behaviour settings. Dangerous: only call when bootstrapping a context-isolated language runner.
-     * 
+     * @deprecated Use ConstantsConfiguration methods instead.
      * @param array $constantSettings The constant settings array.
      * @return array Constant behaviour settings.
      */
