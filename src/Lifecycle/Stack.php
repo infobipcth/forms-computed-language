@@ -19,4 +19,8 @@ class Stack
     public static function peek() {
         return Helpers::arrayEnd(static::$stack);
     }
+
+    public static function debug() {
+        var_dump(static::$stack);
+    }
 }

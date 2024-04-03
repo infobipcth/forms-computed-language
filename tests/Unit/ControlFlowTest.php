@@ -51,3 +51,42 @@ test('only the first valid elseif is executed', function() {
         'd' => 2,
     ]);
 });
+
+test('multiple elseifs with truthy conditions are not evaluated', function() {
+    $this->languageRunner->setVars([]);
+    $this->languageRunner->setCode(<<<'CODE'
+    $a = 3; $b = 4; $c = -7; $d = 2;
+    if ($a < 0) {
+        $a = $a * -1;
+    }
+    elseif ($a > 2) {
+        $a = $a + 2;
+    }
+    elseif ($a >= 2) {
+        $a = $a + 100;
+       }
+    elseif ($b < 0) {
+        $b = 100;
+    }
+    elseif ($c < 0) {
+        $c = $c * -1;
+    }
+    else {
+        $d = 2000;
+    }
+    CODE);
+    $this->languageRunner->evaluate();
+    expect($this->languageRunner->getVars())->toBe([
+        'a' => 5,
+        'b' => 4,
+        'c' => -7,
+        'd' => 2,
+    ]);
+});
+
+test('ternaries work', function () {
+    $this->languageRunner->setCode('$b = true ?  2 + 100 : 500; $c = false ? 100 : 400;');
+    $this->languageRunner->setVars([]);
+    $this->languageRunner->evaluate();
+    expect($this->languageRunner->getVars())->toBe(['b' => 102, 'c' => 400]);
+});

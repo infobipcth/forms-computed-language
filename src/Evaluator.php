@@ -127,14 +127,17 @@ class Evaluator extends NodeVisitorAbstract
      */
     public function enterNode(Node $node)
     {
+        // @codeCoverageIgnoreStart
+        // Debugging helpers are ignored for coverage.
         if (getenv("FCL_DEBUG") === "debug") {
             echo "Entering node\n";
             var_dump(get_class($node));
             echo "Variable store:\n";
-            //var_dump($this->vars);
+            var_dump(VariableStore::getVariables());
             echo "Stack: \n";
-            //var_dump($this->stack);
+            Stack::debug();
         }
+        // @codeCoverageIgnoreEnd
 
         // If this node is part of an if/elseif/else block, we need to be careful:
         // the 'if' condition should be evaluated always; 'elseif' conditions should be
@@ -330,14 +333,17 @@ class Evaluator extends NodeVisitorAbstract
             }
         }
 
+        // @codeCoverageIgnoreStart
+        // Debugging helpers are ignored for coverage.
         if (getenv("FCL_DEBUG") === "debug") {
             echo "Leaving node\n";
             var_dump(get_class($node));
             echo "Variable store:\n";
-            //var_dump($this->vars);
+            var_dump(VariableStore::getVariables());
             echo "Stack: \n";
-            //var_dump($this->stack);
+            Stack::debug();
         }
+        // @codeCoverageIgnoreEnd
     }
 
 

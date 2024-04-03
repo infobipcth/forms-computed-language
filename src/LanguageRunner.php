@@ -18,17 +18,18 @@ class LanguageRunner implements LanguageRunnerInterface
     private $code;
     private $vars;
     private $ast;
-    private $traverser;
     private static $evaluator;
-    private $constantSettings;
     private static $instances = [];
 
+    // @codeCoverageIgnoreStart
     protected function __clone() {}
 
+    // LanguageRunner can not be serialized, so there is no way to test this.
     public function __wakeup()
     {
         throw new \Exception("Cannot unserialize a singleton.");
     }
+    // @codeCoverageIgnoreEnd
 
     /**
      * Construct the language runner. Initialize the parser.
