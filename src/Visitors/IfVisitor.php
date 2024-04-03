@@ -2,7 +2,6 @@
 
 namespace FormsComputedLanguage\Visitors;
 
-use FormsComputedLanguage\Visitors\VisitorInterface;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\If_;
 
@@ -36,6 +35,6 @@ class IfVisitor implements VisitorInterface
 
 	public static function leaveNode(Node &$node)
 	{
-		// TODO: Implement leaveNode() method.
+		// intentionally left empty: no actions needed when leaving the node.
 	}
 }

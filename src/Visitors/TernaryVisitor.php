@@ -18,6 +18,6 @@ class TernaryVisitor implements VisitorInterface
 
 	public static function leaveNode(Node &$node)
 	{
-		// TODO: Implement leaveNode() method.
+		// intentionally left empty: no actions needed when leaving the node.
 	}
 }

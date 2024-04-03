@@ -3,7 +3,6 @@
 namespace FormsComputedLanguage\Visitors;
 
 use FormsComputedLanguage\Lifecycle\Stack;
-use FormsComputedLanguage\Visitors\VisitorInterface;
 use PhpParser\Node;
 
 class ArrayDimFetchVisitor implements VisitorInterface

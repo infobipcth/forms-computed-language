@@ -4,7 +4,6 @@ namespace FormsComputedLanguage\Visitors;
 
 use FormsComputedLanguage\Exceptions\UnknownTokenException;
 use FormsComputedLanguage\Lifecycle\Stack;
-use FormsComputedLanguage\Visitors\VisitorInterface;
 use PhpParser\Node;
 use PhpParser\Node\Expr\BinaryOp\BooleanAnd;
 use PhpParser\Node\Expr\BinaryOp\BooleanOr;
@@ -20,11 +19,14 @@ use PhpParser\Node\Expr\BinaryOp\Plus;
 use PhpParser\Node\Expr\BinaryOp\Smaller;
 use PhpParser\Node\Expr\BinaryOp\SmallerOrEqual;
 
+/**
+ * Class handling all binary operators in FCL.
+ */
 class BinaryOpVisitor implements VisitorInterface
 {
 	public static function enterNode(Node &$node)
 	{
-		// TODO: Implement enterNode() method.
+		// intentionally left empty: no actions needed when entering the node.
 	}
 
 	public static function leaveNode(Node &$node)

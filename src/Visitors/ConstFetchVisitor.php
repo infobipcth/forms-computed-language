@@ -2,30 +2,30 @@
 
 namespace FormsComputedLanguage\Visitors;
 
+use Error;
 use FormsComputedLanguage\Exceptions\UndeclaredVariableUsageException;
 use FormsComputedLanguage\Helpers;
 use FormsComputedLanguage\Lifecycle\Harness;
 use FormsComputedLanguage\Lifecycle\Stack;
-use FormsComputedLanguage\Visitors\VisitorInterface;
 use PhpParser\Node;
 
 class ConstFetchVisitor implements VisitorInterface
 {
 	public static function enterNode(Node &$node)
 	{
-		// TODO: Implement enterNode() method.
+		// intentionally left empty: no actions needed when entering the node.
 	}
 
 	public static function leaveNode(Node &$node)
 	{
 		$constfqn = Helpers::getFqnFromParts($node->name->parts);
-		// todo: fix
-		if (!Harness::getConstantsConfiguration()->canAccessConstant($constfqn)) { // Ask the language runner whether we can pass the constant.
+		if (!Harness::getConstantsConfiguration()->canAccessConstant($constfqn)) {
+			// Check the constants config to ensure constant access is allowed.
 			throw new UndeclaredVariableUsageException("Tried to get the value of disallowed constant {$constfqn}");
 		}
 		try {
 			Stack::push(constant($constfqn));
-		} catch (Error $e) {
+		} catch (Error) {
 			throw new UndeclaredVariableUsageException("Tried to get the value of undefined constant {$constfqn}");
 		}
 	}

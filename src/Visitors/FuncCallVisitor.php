@@ -7,7 +7,6 @@ use FormsComputedLanguage\Functions\CountSelectedItems;
 use FormsComputedLanguage\Functions\IsSelected;
 use FormsComputedLanguage\Functions\Round;
 use FormsComputedLanguage\Lifecycle\Stack;
-use FormsComputedLanguage\Visitors\VisitorInterface;
 use PhpParser\Node;
 
 class FuncCallVisitor implements VisitorInterface
@@ -22,7 +21,7 @@ class FuncCallVisitor implements VisitorInterface
 	];
 	public static function enterNode(Node &$node)
 	{
-		// TODO: Implement enterNode() method.
+		// intentionally left empty: no actions needed when entering the node.
 	}
 
 	public static function leaveNode(Node &$node)
@@ -33,7 +32,7 @@ class FuncCallVisitor implements VisitorInterface
 			$functionName = $node->name->getParts()[0];
 		}
 		$argv = [];
-		foreach ($node->args as $arg) {
+		foreach ($node->args as $ignored) {
 			$argv[] = Stack::pop();
 		}
 

@@ -3,6 +3,7 @@
 namespace FormsComputedLanguage;
 
 use Error;
+use Exception;
 use FormsComputedLanguage\Lifecycle\Harness;
 use FormsComputedLanguage\Lifecycle\VariableStore;
 use PhpParser\NodeDumper;
@@ -27,7 +28,7 @@ class LanguageRunner implements LanguageRunnerInterface
 
 	public function __wakeup()
 	{
-		throw new \Exception("Cannot unserialize a singleton.");
+		throw new Exception("Cannot unserialize a singleton.");
 	}
 
 	/**
@@ -82,8 +83,8 @@ class LanguageRunner implements LanguageRunnerInterface
 	}
 
 	/**
-	 * Given a constant name, grants or denies access. Note that if behaviour is not set, all constants are always available!
-	 *
+	 * Given a constant name, grants or denies access.
+	 * Note that if behaviour is not set, all constants are always available!
 	 * @param string $name Constant name.
 	 * @return boolean true if settings allow access, false otherwise.
 	 */
@@ -137,7 +138,7 @@ class LanguageRunner implements LanguageRunnerInterface
 		VariableStore::reset();
 		Harness::bootstrap(variables: $this->vars, _parser: static::$parser);
 		$traverser = new NodeTraverser();
-		self::$evaluator = new Evaluator($this);
+		self::$evaluator = new Evaluator();
 		$traverser->addVisitor(self::$evaluator);
 		$traverser->traverse($this->ast);
 	}
@@ -147,7 +148,7 @@ class LanguageRunner implements LanguageRunnerInterface
 	 *
 	 * @return Evaluator|null Evaluator instance or null if not initialized.
 	 */
-	public static function getEvaluator() : ?Evaluator
+	public static function getEvaluator(): ?Evaluator
 	{
 		return self::$evaluator;
 	}
@@ -175,9 +176,9 @@ class LanguageRunner implements LanguageRunnerInterface
 
 	/**
 	 * Set the constant behaviour settings. Dangerous: only call when bootstrapping a context-isolated language runner.
-	 * @deprecated Use ConstantsConfiguration methods instead.
 	 * @param array $constantSettings The constant settings array.
-	 * @return array Constant behaviour settings.
+	 * @noinspection PhpInconsistentReturnPointsInspection
+	 * @deprecated Use ConstantsConfiguration methods instead.
 	 */
 	public function setConstantSettings(array $constantSettings)
 	{

@@ -19,12 +19,16 @@ class Round
 	 *
 	 * @param array $args Array of arguments. See class docblock for signature.
 	 * @return float Rounded number.
+	 * @noinspection PhpInconsistentReturnPointsInspection
 	 */
 	public static function run($args)
 	{
 		$argc = (int)(count($args));
 		if ($argc <= 0 || $argc >= 4) {
-			throw new ArgumentCountException("the round() function called with {$argc} arguments, but has one required argument and two optional arguments");
+			throw new ArgumentCountException(
+				"the round() function called with {$argc} arguments, 
+				but has one required argument and two optional arguments"
+			);
 		}
 		if (!is_numeric($args[0])) {
 			$type = gettype($args[0]);

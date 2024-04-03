@@ -20,9 +20,9 @@ class Helpers
 	 *
 	 * e.g. for this class the FQN is FormsComputedLanguage\Helpers
 	 * @param array $parts
-	 * @return void
+	 * @return string
 	 */
-	public static function getFqnFromParts(array $parts)
+	public static function getFqnFromParts(array $parts): string
 	{
 		return implode("\\", $parts);
 	}

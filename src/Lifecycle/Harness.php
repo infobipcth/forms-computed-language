@@ -4,20 +4,32 @@ namespace FormsComputedLanguage\Lifecycle;
 
 use PhpParser\Parser;
 
+/**
+ * A runtime harness around execution.
+ */
 class Harness
 {
 	private static ?Parser $parser;
 	private static ?VariableStore $variableStore;
 	private static ConstantsConfiguration $constantsConfiguration;
 
-	public static function bootstrap(array $variables = [], string $variableStoreContext = 'global', ?Parser $_parser = null): void
-	{
+	/**
+	 * Bootstraps the execution harness.
+	 * @param array $variables An array of variables to define. Keys are variable names.
+	 * @param string $variableStoreContext A context handle for the variable store.
+	 * @param Parser|null $_parser A Parser instance.
+	 * @return void
+	 */
+	public static function bootstrap(
+		array $variables = [],
+		string $variableStoreContext = 'global',
+		?Parser $_parser = null
+	): void {
 		if (!isset(static::$constantsConfiguration)) {
 			static::$constantsConfiguration = new ConstantsConfiguration();
 		}
 		static::$variableStore = new VariableStore();
 		static::$variableStore->setVariables($variables, $variableStoreContext);
-		//static::$constantsConfiguration = new ConstantsConfiguration();
 		static::$parser = $_parser;
 	}
 

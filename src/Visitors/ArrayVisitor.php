@@ -3,19 +3,18 @@
 namespace FormsComputedLanguage\Visitors;
 
 use FormsComputedLanguage\Lifecycle\Stack;
-use FormsComputedLanguage\Visitors\VisitorInterface;
 use PhpParser\Node;
 
 class ArrayVisitor implements VisitorInterface
 {
 	public static function enterNode(Node &$node)
 	{
-		// TODO: Implement enterNode() method.
+		// intentionally left empty: no actions needed when entering the node.
 	}
 
 	public static function leaveNode(Node &$node)
 	{
-		$arraySize = count($node?->items);
+		$arraySize = count($node->items);
 		$array = [];
 		for ($i = $arraySize - 1; $i >= 0; $i--) {
 			$arrayItem = Stack::pop();

@@ -5,7 +5,6 @@ namespace FormsComputedLanguage\Visitors;
 use FormsComputedLanguage\Exceptions\UnknownTokenException;
 use FormsComputedLanguage\Lifecycle\Stack;
 use FormsComputedLanguage\Lifecycle\VariableStore;
-use FormsComputedLanguage\Visitors\VisitorInterface;
 use PhpParser\Node;
 use PhpParser\Node\Expr\AssignOp\Concat as AssignOpConcat;
 use PhpParser\Node\Expr\AssignOp\Div as AssignOpDiv;
@@ -13,6 +12,9 @@ use PhpParser\Node\Expr\AssignOp\Minus as AssignOpMinus;
 use PhpParser\Node\Expr\AssignOp\Mul as AssignOpMul;
 use PhpParser\Node\Expr\AssignOp\Plus as AssignOpPlus;
 
+/**
+ * Class handling all assignment operators.
+ */
 class AssignOpVisitor implements VisitorInterface
 {
 	public static function leaveNode(Node &$node)
@@ -36,6 +38,6 @@ class AssignOpVisitor implements VisitorInterface
 
 	public static function enterNode(Node &$node)
 	{
-		// empty.
+		// intentionally left empty: no actions needed when leaving the node.
 	}
 }

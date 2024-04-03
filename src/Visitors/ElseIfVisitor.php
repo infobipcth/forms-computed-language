@@ -3,15 +3,14 @@
 namespace FormsComputedLanguage\Visitors;
 
 use FormsComputedLanguage\Visitors\ExecutionChangeExceptions\DontTraverseChildren;
-use FormsComputedLanguage\Visitors\VisitorInterface;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ElseIf_;
-use PhpParser\NodeTraverser;
 
 class ElseIfVisitor implements VisitorInterface
 {
 	public static function enterNode(Node &$node)
 	{
+		// see Evaluator comments for explanations into how relationships are set up.
 		$parentIf = $node->getAttribute('parentIf');
 		if ($node instanceof ElseIf_) {
 			if ($parentIf->getAttribute('hasEvaluatedElifs')) {
@@ -32,6 +31,6 @@ class ElseIfVisitor implements VisitorInterface
 
 	public static function leaveNode(Node &$node)
 	{
-		// TODO: Implement leaveNode() method.
+		// intentionally left empty: no actions needed when leaving the node.
 	}
 }

@@ -3,7 +3,6 @@
 namespace FormsComputedLanguage\Functions;
 
 use FormsComputedLanguage\Exceptions\ArgumentCountException;
-use FormsComputedLanguage\Exceptions\TypeException;
 
 /**
  * Run the isSelected() function, a wrapper over in_array.
@@ -23,7 +22,8 @@ class IsSelected
 	{
 		$argc = (int)(count($args));
 		if ($argc !== 2) {
-			throw new ArgumentCountException("the isSelected() function called with {$argc} arguments, but has exactly two required arguments");
+			throw new ArgumentCountException("the isSelected() function called with {$argc} arguments, 
+			but has exactly two required arguments");
 		}
 		if (!is_array($args[0])) {
 			return false;
