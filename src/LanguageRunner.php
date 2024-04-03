@@ -3,6 +3,8 @@
 namespace FormsComputedLanguage;
 
 use Error;
+use FormsComputedLanguage\Lifecycle\Harness;
+use FormsComputedLanguage\Lifecycle\VariableStore;
 use PhpParser\NodeDumper;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
@@ -17,7 +19,7 @@ class LanguageRunner implements LanguageRunnerInterface
     private $vars;
     private $ast;
     private $traverser;
-    private $evaluator;
+    private static $evaluator;
     private $constantSettings;
     private static $instances = [];
 
@@ -31,7 +33,7 @@ class LanguageRunner implements LanguageRunnerInterface
     /**
      * Construct the language runner. Initialize the parser.
      */
-    protected function __construct()
+    public function __construct()
     {
         $this->parser = (new ParserFactory())->create(3);
     }
@@ -54,7 +56,7 @@ class LanguageRunner implements LanguageRunnerInterface
      */
     public function setDisallowedConstants(array $disallow)
     {
-        $this->constantSettings['disallow'] = $disallow;
+       Harness::getConstantsConfiguration()->setDisallowedConstants($disallow);
     }
 
     /**
@@ -65,7 +67,7 @@ class LanguageRunner implements LanguageRunnerInterface
      */
     public function setAllowedConstants(array $allow)
     {
-        $this->constantSettings['allow'] = $allow;
+        Harness::getConstantsConfiguration()->setAllowedConstants($allow);
     }
 
     /**
@@ -76,7 +78,7 @@ class LanguageRunner implements LanguageRunnerInterface
      */
     public function setConstantBehaviour(string $type)
     {
-        $this->constantSettings['behaviour'] = $type;
+        Harness::getConstantsConfiguration()->setConstantBehaviour($type);
     }
 
     /**
@@ -87,15 +89,7 @@ class LanguageRunner implements LanguageRunnerInterface
      */
     public function canAccessConstant(string $name)
     {
-        if (!isset($this->constantSettings['behaviour'])) {
-            return true;
-        }
-
-        if ($this->constantSettings['behaviour'] === 'whitelist') {
-            return in_array($name, $this->constantSettings['allow'], true);
-        } else {
-            return !in_array($name, $this->constantSettings['disallow'], true);
-        }
+       return Harness::getConstantsConfiguration()->canAccessConstant($name);
     }
 
     /**
@@ -140,10 +134,17 @@ class LanguageRunner implements LanguageRunnerInterface
      */
     public function evaluate()
     {
+        VariableStore::reset();
+        Harness::bootstrap(variables: $this->vars, _parser: $this->parser);
         $traverser = new NodeTraverser();
-        $this->evaluator = new Evaluator($this->vars, $this);
-        $traverser->addVisitor($this->evaluator);
+        self::$evaluator = new Evaluator($this);
+        //$this->evaluator->nt = $traverser;
+        $traverser->addVisitor(self::$evaluator);
         $traverser->traverse($this->ast);
+    }
+
+    public static function getEvaluator() {
+        return self::$evaluator;
     }
 
     /**
@@ -153,7 +154,7 @@ class LanguageRunner implements LanguageRunnerInterface
      */
     public function getVars()
     {
-        return $this->vars;
+        return VariableStore::getVariables(); //$this->vars;
     }
 
     /**
@@ -162,7 +163,7 @@ class LanguageRunner implements LanguageRunnerInterface
      * @return array Constant behaviour settings.
      */
     public function getConstantBehaviour() {
-        return $this->constantSettings ?? [];
+        return Harness::getConstantsConfiguration()->behaviour ?? [];
     }
 
     /**
@@ -172,6 +173,8 @@ class LanguageRunner implements LanguageRunnerInterface
      * @return array Constant behaviour settings.
      */
     public function setConstantSettings(array $constantSettings) {
-        $this->constantSettings = $constantSettings;
+        Harness::getConstantsConfiguration()->setConstantBehaviour($constantSettings['behaviour']);
+        Harness::getConstantsConfiguration()->setAllowedConstants($constantSettings['allow']);
+        Harness::getConstantsConfiguration()->setDisallowedConstants($constantSettings['disallow']);
     }
 }
