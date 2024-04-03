@@ -13,8 +13,26 @@ use FormsComputedLanguage\Exceptions\UnknownTokenException;
 use FormsComputedLanguage\Functions\CountSelectedItems;
 use FormsComputedLanguage\Functions\Round;
 use FormsComputedLanguage\Functions\IsSelected;
+use FormsComputedLanguage\Lifecycle\Stack;
+use FormsComputedLanguage\Lifecycle\VariableStore;
 use FormsComputedLanguage\StackObjects\ArrayItem as StackObjectsArrayItem;
 // Node types from php-parser
+use FormsComputedLanguage\Visitors\ArrayDimFetchVisitor;
+use FormsComputedLanguage\Visitors\ArrayItemVisitor;
+use FormsComputedLanguage\Visitors\ArrayVisitor;
+use FormsComputedLanguage\Visitors\AssignOpVisitor;
+use FormsComputedLanguage\Visitors\AssignVisitor;
+use FormsComputedLanguage\Visitors\BinaryOpVisitor;
+use FormsComputedLanguage\Visitors\ConstFetchVisitor;
+use FormsComputedLanguage\Visitors\ElseIfVisitor;
+use FormsComputedLanguage\Visitors\ElseVisitor;
+use FormsComputedLanguage\Visitors\ExecutionChangeExceptions\ExecutionChangeException;
+use FormsComputedLanguage\Visitors\ForeachVisitor;
+use FormsComputedLanguage\Visitors\FuncCallVisitor;
+use FormsComputedLanguage\Visitors\IfVisitor;
+use FormsComputedLanguage\Visitors\ScalarVisitor;
+use FormsComputedLanguage\Visitors\TernaryVisitor;
+use FormsComputedLanguage\Visitors\VariableVisitor;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\Array_;
@@ -85,24 +103,17 @@ class Evaluator extends NodeVisitorAbstract
      */
     private LanguageRunner $languageRunner;
 
-    /**
-     * Callbacks to run for available functions.
-     */
-    private const FUNCTION_CALLBACKS = [
-        'round' => [Round::class, 'run'],
-        'countSelectedItems' => [CountSelectedItems::class, 'run'],
-        'isSelected' => [IsSelected::class, 'run'],
-    ];
+
 
     /**
      * Boot up the evaluator VM. Sets initial variables and initializes an empty stack.
      *
      * @param array $_vars Variables to initialize. Array keys are variable names, values are values.
      */
-    public function __construct(array $_vars, LanguageRunner $_languageRunner)
+    public function __construct(LanguageRunner $_languageRunner)
     {
-        $this->vars = $_vars; // Initialize the variables to passed variables.
-        $this->stack = []; // Initialize the empty stack.
+        // $this->vars = $_vars; // Initialize the variables to passed variables.
+        //$this->stack = []; // Initialize the empty stack.
         $this->languageRunner = $_languageRunner; // Remember the language runner.
     }
 
@@ -120,9 +131,9 @@ class Evaluator extends NodeVisitorAbstract
             echo "Entering node\n";
             var_dump(get_class($node));
             echo "Variable store:\n";
-            var_dump($this->vars);
+            //var_dump($this->vars);
             echo "Stack: \n";
-            var_dump($this->stack);
+            //var_dump($this->stack);
         }
 
         // If this node is part of an if/elseif/else block, we need to be careful:
@@ -195,110 +206,41 @@ class Evaluator extends NodeVisitorAbstract
         }
 
         // Start evaluating nodes.
+        if ($node instanceof Scalar) ScalarVisitor::enterNode($node);
 
-        if ($node instanceof Scalar) { // If this node is a scalar, push its value to the stack.
-            $this->stack[] = $node->value ?? null;
-        }
+        if($node instanceof Variable) VariableVisitor::enterNode($node);
 
-        if ($node instanceof Variable) { // If this node references a variable e.g. $x, push the variable value to the stack.
-            if (!($node->getAttribute('parentIsAssignment', false))) {
-                $this->stack[] = $this->vars[$node->name] ?? null;
-            }
-            else {
-                $this->stack[] = $node->name ?? null;
-            }
-        }
-
-        // Set up relationships and references for children of If, Elseif, Else blocks and ternary operators.
-        if ($node instanceof If_) {
-            if ($node->cond) {
-                $node->cond->setAttribute('parentIf', $node);
-                $node->cond->setAttribute('parentRelationship', 'cond');
-            }
-
-            foreach ($node->stmts ?? [] as $statement) {
-                $statement->setAttribute('parentIf', $node);
-                $statement->setAttribute('parentRelationship', 'stmt');
-            }
-
-            foreach ($node->elseifs ?? [] as $elseif) {
-                $elseif->setAttribute('parentIf', $node);
-                $elseif->setAttribute('parentRelationship', 'elif');
-            }
-
-            if ($node->else) {
-                $node->else->setAttribute('parentIf', $node);
-                $node->else->setAttribute('parentRelationship', 'else');
-            }
-        }
+        if ($node instanceof If_) IfVisitor::enterNode($node);
 
         if ($node instanceof ElseIf_) {
-            if ($parentIf->getAttribute('hasEvaluatedElifs')) {
-                return NodeTraverser::DONT_TRAVERSE_CHILDREN;
-            }
-
-            $node->cond->setAttribute('parentIf', $parentIf);
-            $node->cond->setAttribute('parentElseif', $node);
-            $node->cond->setAttribute('parentElseifRelationship', 'cond');
-
-            foreach ($node->stmts as $stmt) {
-                $stmt->setAttribute('parentIf', $parentIf);
-                $stmt->setAttribute('parentElseif', $node);
-                $stmt->setAttribute('parentElseifRelationship', 'stmt');
-            }
+            try { ElseIfVisitor::enterNode($node); }
+            catch (ExecutionChangeException $e) { return $e->getChange(); }
         }
 
         if ($node instanceof Else_) {
-            if ($parentIf->getAttribute('condTruthy') == true) {
-                return NodeTraverser::DONT_TRAVERSE_CHILDREN;
-            }
-
-            if ($parentIf->getAttribute('hasEvaluatedElifs') == true) {
-                return NodeTraverser::DONT_TRAVERSE_CHILDREN;
-            }
+            try { ElseVisitor::enterNode($node); }
+            catch (ExecutionChangeException $e) { return $e->getChange(); }
         }
 
         if ($node instanceof Ternary) {
-            $node->cond->setAttribute('parentTernary', $node);
-            $node->cond->setAttribute('parentTernaryRelationship', 'cond');
-            $node->if->setAttribute('parentTernary', $node);
-            $node->if->setAttribute('parentTernaryRelationship', 'if');
-            $node->else->setAttribute('parentTernary', $node);
-            $node->else->setAttribute('parentTernaryRelationship', 'else');
+            TernaryVisitor::enterNode($node);
         }
 
         if ($node instanceof Assign) {
-            $node->var->setAttribute('parentIsAssignment', true);
-            $node->var->setAttribute('parentAssign', $node);
+           AssignVisitor::enterNode($node);
         }
 
         if ($node instanceof ArrayDimFetch) {
-            $node->var->setAttribute('parentIsAssignment', $node->getAttribute('parentIsAssignment', false));
+            ArrayDimFetchVisitor::enterNode($node);
         }
 
         if ($node instanceof Foreach_) {
-            $iteratedArray = $this->vars[$node->expr->name] ?? [];
-            foreach ($iteratedArray as $iterationKey => $iterationValue) {
-                $isolatedLoopContextTraverser = new NodeTraverser();
-                $mockedLr = LanguageRunner::getInstance();
-                $mockedLr->setConstantSettings($this->languageRunner->getConstantBehaviour());
-                $iterationVars = [
-                    ...$this->vars, 
-                ];
-                if ($node?->keyVar) {
-                    $iterationVars[$node->keyVar?->name] = $iterationKey;
-                }
-                if ($node?->valueVar) {
-                    $iterationVars[$node->valueVar?->name] = $iterationValue;
-                }
-                $isolatedLoopContextEvaluator = new Evaluator($iterationVars, $mockedLr);
-                $isolatedLoopContextTraverser->addVisitor($isolatedLoopContextEvaluator);
-                $isolatedLoopContextTraverser->traverse($node->stmts);
-                $afterIterationVars = $mockedLr->getVars();
-                $this->vars = $afterIterationVars;
+            try {
+                ForeachVisitor::enterNode($node);
             }
-            unset($this->vars[$node->keyVar?->name], $this->vars[$node->valueVar?->name]);
-            return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+            catch (ExecutionChangeException $e) {
+                return $e->getChange();
+            }
         }
     }
 
@@ -320,151 +262,30 @@ class Evaluator extends NodeVisitorAbstract
         $nodeType = get_class($node);
 
         if ($node instanceof Assign) {
-            if ($node->getAttribute('isArrayAssignment', false)) {
-                $dimensional = $node->getAttribute('isArrayAssignmentByDim', false);
-                $value = array_pop($this->stack);
-                if ($dimensional) {
-                    $dim = array_pop($this->stack);
-                }
-                $name = array_pop($this->stack);
-                if (!$dimensional) {
-                    $this->vars[$name][] = $value;
-                }
-                else {
-                    $this->vars[$name][$dim] = $value;
-                }
-            } else {
-                if (!($node->dim ?? false)) {
-                    $this->vars[$node->var->name] = array_pop($this->stack);
-                }
-                else {
-                    $arrayDim = array_pop($this->stack);
-                    $arrayVal = array_pop($this->stack);
-                    $this->vars[$node->var->name][$arrayDim] = $arrayVal;
-                }
-            }
+            AssignVisitor::leaveNode($node);
         } elseif ($node instanceof AssignOp) {
-            if ($node instanceof AssignOpPlus) {
-                $this->vars[$node->var->name] += array_pop($this->stack);
-            } elseif ($node instanceof AssignOpMinus) {
-                $this->vars[$node->var->name] -= array_pop($this->stack);
-            } elseif ($node instanceof AssignOpMul) {
-                $this->vars[$node->var->name] *= array_pop($this->stack);
-            } elseif ($node instanceof AssignOpDiv) {
-                $this->vars[$node->var->name] /= array_pop($this->stack);
-            } elseif ($node instanceof AssignOpConcat) {
-                $this->vars[$node->var->name] .= array_pop($this->stack);
-            } else {
-                throw new UnknownTokenException("Unknown assignment operator {$nodeType} used");
-            }
+            AssignOpVisitor::leaveNode($node);
         } elseif ($node instanceof BinaryOp) {
-            $rhs = array_pop($this->stack);
-            $lhs = array_pop($this->stack);
-
-            if ($node instanceof Concat) {
-                $this->stack[] = $lhs . $rhs;
-            } elseif ($node instanceof Plus) {
-                $this->stack[] = $lhs + $rhs;
-            } elseif ($node instanceof Minus) {
-                $this->stack[] = $lhs - $rhs;
-            } elseif ($node instanceof Mul) {
-                $this->stack[] = $lhs * $rhs;
-            } elseif ($node instanceof Div) {
-                $this->stack[] = $lhs / $rhs;
-            } elseif ($node instanceof Equal) {
-                $this->stack[] = $lhs == $rhs;
-            } elseif ($node instanceof NotEqual) {
-                $this->stack[] = $lhs != $rhs;
-            } elseif ($node instanceof Smaller) {
-                $this->stack[] = $lhs < $rhs;
-            } elseif ($node instanceof SmallerOrEqual) {
-                $this->stack[] = $lhs <= $rhs;
-            } elseif ($node instanceof Greater) {
-                $this->stack[] = $lhs > $rhs;
-            } elseif ($node instanceof GreaterOrEqual) {
-                $this->stack[] = $lhs >= $rhs;
-            } elseif ($node instanceof BooleanAnd) {
-                $this->stack[] = ($lhs && $rhs);
-            } elseif ($node instanceof BooleanOr) {
-                $this->stack[] = ($lhs || $rhs);
-            } else {
-                throw new UnknownTokenException("Unknown boolean operator {$nodeType} used");
-            }
+            BinaryOpVisitor::leaveNode($node);
         } elseif ($node instanceof UnaryMinus) {
-            $t = array_pop($this->stack);
-            $this->stack[] = -$t;
+            $t = Stack::pop();
+            Stack::push(-$t);
         } elseif ($node instanceof UnaryPlus) {
-            $t = array_pop($this->stack);
-            $this->stack[] = +$t;
+            $t = Stack::pop();
+            Stack::push(+$t);
         } elseif ($node instanceof ConstFetch) {
-            $constfqn = Helpers::getFqnFromParts($node->name->parts);
-            if (!$this->languageRunner->canAccessConstant($constfqn)) { // Ask the language runner whether we can pass the constant.
-                throw new UndeclaredVariableUsageException("Tried to get the value of disallowed constant {$constfqn}");
-            }
-            try {
-                $this->stack[] = constant($constfqn);
-            } catch (Error $e) {
-                throw new UndeclaredVariableUsageException("Tried to get the value of undefined constant {$constfqn}");
-            }
+            ConstFetchVisitor::leaveNode($node);
         } elseif ($node instanceof FuncCall) {
-            if (!empty((string) $node->name)) {
-                $functionName = (string)($node->name);
-            }
-            else {
-                $functionName = $node->name->getParts()[0];
-            }
-            $argv = [];
-            foreach ($node->args as $arg) {
-                $argv[] = array_pop($this->stack);
-            }
-
-            $argv = array_reverse($argv);
-
-            if (!isset(self::FUNCTION_CALLBACKS[$functionName])) {
-                throw new UnknownFunctionException("Undefined function {$functionName} called");
-            }
-
-            $this->stack[] = call_user_func_array(self::FUNCTION_CALLBACKS[$functionName], [$argv]);
+            FuncCallVisitor::leaveNode($node);
         } elseif ($node instanceof BooleanNot) {
-            $temp = array_pop($this->stack);
-            $this->stack[] = !$temp;
+            $temp = Stack::pop();
+            Stack::push(!$temp);
         } elseif ($node instanceof ArrayItem) {
-            $arrayItemValue = array_pop($this->stack);
-            if ($node?->key) {
-                $arrayItemKey = array_pop($this->stack);
-            }
-            $arrayItem = new StackObjectsArrayItem($arrayItemKey ?? null, $arrayItemValue);
-            $this->stack[] = $arrayItem;
+            ArrayItemVisitor::leaveNode($node);
         } elseif ($node instanceof Array_) {
-            $arraySize = count($node->items);
-            $array = [];
-            for ($i = $arraySize - 1; $i >= 0; $i--) {
-                $arrayItem = array_pop($this->stack);
-                if ($arrayItem?->key) {
-                    $array[$arrayItem->key] = $arrayItem->value;
-                } else {
-                    $array[$i] = $arrayItem->value;
-                }
-            }
-            $this->stack[] = array_reverse($array);
+           ArrayVisitor::leaveNode($node);
         } elseif ($node instanceof ArrayDimFetch) {
-            if (!($node->getAttribute('parentIsAssignment', false))) {
-                $arrayDim = array_pop($this->stack);
-                $array = array_pop($this->stack);
-                $this->stack[] = $array[$arrayDim];
-            }
-            else {
-                $assignmentNode = $node->getAttribute('parentAssign');
-                $assignmentNode->setAttribute('isArrayAssignment', true);
-                if ($node->dim ?? false) {
-                    $assignmentNode->setAttribute('isArrayAssignmentByDim', true);
-                    $arrayDim = array_pop($this->stack);
-                    $this->stack[] = $arrayDim;
-                } 
-                $arrayName = array_pop($this->stack);
-                $this->stack[] = $arrayName;
-                
-            }
+            ArrayDimFetchVisitor::leaveNode($node);
         } elseif (
             $node instanceof Variable
             || $node instanceof Scalar
@@ -491,21 +312,21 @@ class Evaluator extends NodeVisitorAbstract
                 // If yes, its evaluation is on the top of the stack. We can push it up to the parent elseif,
                 // so statements inside it know whether to execute or not.
                 // Note that we are not popping the stack, simply looking at its top.
-                $parentElseif->setAttribute('condTruthy', Helpers::arrayEnd($this->stack));
+                $parentElseif->setAttribute('condTruthy', Stack::peek());
             }
         }
 
         if ($parent = $node->getAttribute('parentIf')) { // Is this node a direct descentant of an If?
             if ($node->getAttribute('parentRelationship') === 'cond') { // Is this node the condition of an If?
                 // Push the evaluation to the parent if.
-                $parent->setAttribute('condTruthy', Helpers::arrayEnd($this->stack));
+                $parent->setAttribute('condTruthy', Stack::peek());
             }
         }
 
         if ($parentTernary = $node->getAttribute('parentTernary')) { // Is this node a direct descendant of a ternary operator?
             if ($node->getAttribute('parentTernaryRelationship') === 'cond') { // Is this node a condition of the ternary?
                 // Push the evaluation to the parent ternary node.
-                $parentTernary->setAttribute('condTruthy', Helpers::arrayEnd($this->stack));
+                $parentTernary->setAttribute('condTruthy', Stack::peek());
             }
         }
 
@@ -513,14 +334,11 @@ class Evaluator extends NodeVisitorAbstract
             echo "Leaving node\n";
             var_dump(get_class($node));
             echo "Variable store:\n";
-            var_dump($this->vars);
+            //var_dump($this->vars);
             echo "Stack: \n";
-            var_dump($this->stack);
+            //var_dump($this->stack);
         }
     }
 
-    public function afterTraverse(array $nodes)
-    {
-        $this->languageRunner->setVars($this->vars);
-    }
+
 }
