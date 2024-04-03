@@ -14,31 +14,28 @@ use PhpParser\ParserFactory;
  */
 class LanguageRunner implements LanguageRunnerInterface
 {
-	private $parser;
+	private static $parser;
 	private $code;
 	private $vars;
 	private $ast;
 	private static $evaluator;
 	private static $instances = [];
 
-	// @codeCoverageIgnoreStart
 	protected function __clone()
 	{
 	}
 
-	// LanguageRunner can not be serialized, so there is no way to test this.
 	public function __wakeup()
 	{
 		throw new \Exception("Cannot unserialize a singleton.");
 	}
-	// @codeCoverageIgnoreEnd
 
 	/**
 	 * Construct the language runner. Initialize the parser.
 	 */
 	public function __construct()
 	{
-		$this->parser = (new ParserFactory())->create(3);
+		static::$parser = (new ParserFactory())->create(3);
 	}
 
 	public static function getInstance(): LanguageRunner
@@ -105,7 +102,7 @@ class LanguageRunner implements LanguageRunnerInterface
 	public function setCode(string $code)
 	{
 		$this->code = '<?php ' . $code;
-		$this->ast = $this->parser->parse($this->code);
+		$this->ast = static::$parser->parse($this->code);
 	}
 
 	/**
@@ -138,14 +135,19 @@ class LanguageRunner implements LanguageRunnerInterface
 	public function evaluate()
 	{
 		VariableStore::reset();
-		Harness::bootstrap(variables: $this->vars, _parser: $this->parser);
+		Harness::bootstrap(variables: $this->vars, _parser: static::$parser);
 		$traverser = new NodeTraverser();
 		self::$evaluator = new Evaluator($this);
 		$traverser->addVisitor(self::$evaluator);
 		$traverser->traverse($this->ast);
 	}
 
-	public static function getEvaluator()
+	/**
+	 * Gets the Evaluator instance.
+	 *
+	 * @return Evaluator|null Evaluator instance or null if not initialized.
+	 */
+	public static function getEvaluator() : ?Evaluator
 	{
 		return self::$evaluator;
 	}

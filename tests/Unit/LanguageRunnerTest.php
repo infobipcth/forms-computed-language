@@ -9,6 +9,7 @@ test('LanguageRunner factory works', function () {
     expect($this->languageRunner->getVars())->toBe(['a' => 2]);
 });
 
-test('Serializing the LanguageRunner throws', function() {
-    expect(fn() => (serialize($this->languageRunner)))->toThrow(\Exception::class);
+test('Unserializing the LanguageRunner throws', function() {
+	$serialized = serialize($this->languageRunner);
+    expect(fn() => (unserialize($serialized)))->toThrow(\Exception::class);
 });
