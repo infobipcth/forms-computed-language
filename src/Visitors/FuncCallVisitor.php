@@ -19,6 +19,7 @@ class FuncCallVisitor implements VisitorInterface
 		'countSelectedItems' => [CountSelectedItems::class, 'run'],
 		'isSelected' => [IsSelected::class, 'run'],
 	];
+
 	public static function enterNode(Node &$node)
 	{
 		// intentionally left empty: no actions needed when entering the node.
