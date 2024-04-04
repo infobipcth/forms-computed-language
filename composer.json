@@ -15,6 +15,10 @@
         {
             "name": "Mario Borna Mjertan",
             "email": "marioborna.mjertan@infobip.com"
+        },
+        {
+            "name": "Denis Žoljom",
+            "email": "denis.zoljom@infobip.com"
         }
     ],
     "require": {
