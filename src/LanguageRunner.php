@@ -160,7 +160,7 @@ class LanguageRunner implements LanguageRunnerInterface
 	 */
 	public function getVars()
 	{
-		return VariableStore::getVariables(); //$this->vars;
+		return VariableStore::getVariables();
 	}
 
 	/**
