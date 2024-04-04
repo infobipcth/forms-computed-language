@@ -93,22 +93,16 @@ class Evaluator extends NodeVisitorAbstract
 		}
 		// @codeCoverageIgnoreEnd
 
-		// If this node is part of an if/elseif/else block, we need to be careful:
-		// the 'if' condition should be evaluated always; 'elseif' conditions should be
-		// evaluated only if every previous condition in the block was false.
-		// We calculate the condition value, and then push the value up to the parent
-		// so that we can know whether or not to execute the inner statements of the if/elseif/else block.
-		// This check needs to happen when entering a node that's a condition or a statement as we traverse
-		// the AST recursively and don't return to the If block until all statements and conditions have been traversed.
-		// To support this, we need to set up node relationship references when entering the If block,
-		// so that we know whether a particular statement is part of an if condition, a statement that should be
-		// executed if the if is true; and so on for elseifs and else. Similar tricks are used for the ternary operator.
-		// We set a 'parentIf', 'parentElseif', 'parentTernary' attribute on the applicable child nodes with a reference
-		// to the parent node, and a 'parentIfRelationship' etc. attribute describing the relationship between the
-		// child and the parent.
-		// On every if and elseif node that's not skipped
-		// (there haven't been any true conditions in the block previously)
-		// we set a 'condTruthy' attribute to indicate what does the condition evaluate to.
+		/**
+		 * If this node is part of an if/elseif/else block, we need to be careful:
+		 * the 'if' condition should be evaluated always; 'elseif' conditions should be evaluated only if every previous condition in the block was false.
+		 * We calculate the condition value, and then push the value up to the parent so that we can know whether or not to execute the inner statements of the if/elseif/else block.
+		 * This check needs to happen when entering a node that's a condition or a statement as we traverse the AST recursively and don't return to the If block until all statements and conditions have been traversed.
+		 * To support this, we need to set up node relationship references when entering the If block, so that we know whether a particular statement is part of an if condition, a statement that should be executed if the if is true; and so on for elseifs and else.
+		 * Similar tricks are used for the ternary operator.
+		 * We set a 'parentIf', 'parentElseif', 'parentTernary' attribute on the applicable child nodes with a reference to the parent node, and a 'parentIfRelationship' etc. attribute describing the relationship between the child and the parent.
+		 * On every if and elseif node that's not skipped (there haven't been any true conditions in the block previously) we set a 'condTruthy' attribute to indicate what does the condition evaluate to.
+		 */
 
 		$parentIf = $node->getAttribute('parentIf');
 		$parentElseif = $node->getAttribute('parentElseif');
