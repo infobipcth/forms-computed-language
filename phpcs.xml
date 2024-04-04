@@ -10,12 +10,12 @@
     <arg name="parallel" value="75"/>
     <arg value="sp"/>
 
-    <!-- Don't hide tokenizer exceptions -->
+    <!-- Don't hide tokenizer exceptions. -->
     <rule ref="Internal.Tokenizer.Exception">
         <type>error</type>
     </rule>
 
-    <rule ref="PSR12"></rule>
+    <rule ref="PSR12" />
 
     <!-- Use tabs, not spaces. -->
     <rule ref="Generic.WhiteSpace">
