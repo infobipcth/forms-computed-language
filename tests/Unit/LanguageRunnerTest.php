@@ -1,11 +1,15 @@
-<?php
+<?php /** @noinspection PhpFullyQualifiedNameUsageInspection */
 
-use FormsComputedLanguage\LanguageRunner;
+namespace Tests\Unit;
 
-test('LanguageRunner works', function () {
-    $lr = new LanguageRunner;
-    $lr->setCode('$a = 2;');
-    $lr->setVars([]);
-    $lr->evaluate();
-    expect($lr->getVars())->toBe(['a' => 2]);
+test('LanguageRunner factory works', function () {
+    $this->languageRunner->setCode('$a = 2;');
+    $this->languageRunner->setVars([]);
+    $this->languageRunner->evaluate();
+    expect($this->languageRunner->getVars())->toBe(['a' => 2]);
+});
+
+test('Unserializing the LanguageRunner throws', function() {
+	$serialized = serialize($this->languageRunner);
+    expect(fn() => (unserialize($serialized)))->toThrow(\Exception::class);
 });

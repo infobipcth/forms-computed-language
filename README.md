@@ -8,6 +8,7 @@ of PHP tokens in a safe manner in PHP.
 
 ## Supported features and tokens
 * Basic variables (numeric, boolean and string types)
+* Arrays and `foreach` loops without references
 * Fetching constants from PHP
 * Arithmetic and logical operators (`+, -, /, *, !, &&, ||`)
 * Assignment operators (`+=, .=` etc.)
@@ -19,7 +20,6 @@ of PHP tokens in a safe manner in PHP.
 
 
 ## Notably missing or different
-* Arrays can't be defined or manipulated with using FCL, apart from arrays that are defined during VM initialization (which can be counted and checked to see if an entry exists)
 * `++`, `--` and `===` operators (an easy PR :))
 * `switch` and `match` blocks
 * User-defined functions
