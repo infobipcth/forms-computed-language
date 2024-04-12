@@ -4,6 +4,8 @@ namespace FormsComputedLanguage\Visitors;
 
 use FormsComputedLanguage\LanguageRunner;
 use FormsComputedLanguage\Lifecycle\VariableStore;
+use FormsComputedLanguage\Visitors\ExecutionChangeExceptions\BreakOutOfLoopException;
+use FormsComputedLanguage\Visitors\ExecutionChangeExceptions\ContinueLoopException;
 use FormsComputedLanguage\Visitors\ExecutionChangeExceptions\DontTraverseChildren;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
@@ -29,8 +31,23 @@ class ForeachVisitor implements VisitorInterface
 				VariableStore::setVariable($node->valueVar?->name, $iterationValue);
 			}
 			// traverse the statements in a loop.
-			$isolatedLoopContextTraverser->traverse($node->stmts);
+
+			try {
+				// Catch break and continue exceptions.
+				$isolatedLoopContextTraverser->traverse($node->stmts);
+			} catch (\Exception $e) {
+				// If exception is for break, remove from store and don't traverse children.
+				if ($e instanceof BreakOutOfLoopException) {
+					$iterationKeyVariableName ? VariableStore::unset($iterationKeyVariableName) : null;
+					$iterationValueVariableName ? VariableStore::unset($iterationValueVariableName) : null;
+					DontTraverseChildren::throw();
+				} elseif ($e instanceof ContinueLoopException) {
+					// continue to the next iteration.
+					continue;
+				}
+			}
 		}
+
 		// unset the foreach iterators when out of foreach scope.
 		$iterationKeyVariableName ? VariableStore::unset($iterationKeyVariableName) : null;
 		$iterationValueVariableName ? VariableStore::unset($iterationValueVariableName) : null;
