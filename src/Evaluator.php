@@ -18,7 +18,9 @@ use FormsComputedLanguage\Visitors\ArrayVisitor;
 use FormsComputedLanguage\Visitors\AssignOpVisitor;
 use FormsComputedLanguage\Visitors\AssignVisitor;
 use FormsComputedLanguage\Visitors\BinaryOpVisitor;
+use FormsComputedLanguage\Visitors\BreakVisitor;
 use FormsComputedLanguage\Visitors\ConstFetchVisitor;
+use FormsComputedLanguage\Visitors\ContinueVisitor;
 use FormsComputedLanguage\Visitors\ElseIfVisitor;
 use FormsComputedLanguage\Visitors\ElseVisitor;
 use FormsComputedLanguage\Visitors\ExecutionChangeExceptions\ExecutionChangeException;
@@ -46,6 +48,8 @@ use PhpParser\Node\Expr\UnaryPlus;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar;
+use PhpParser\Node\Stmt\Break_;
+use PhpParser\Node\Stmt\Continue_;
 use PhpParser\Node\Stmt\Else_;
 use PhpParser\Node\Stmt\ElseIf_;
 use PhpParser\Node\Stmt\Expression;
@@ -209,6 +213,14 @@ class Evaluator extends NodeVisitorAbstract
 				return $e->getChange();
 			}
 		}
+
+		if ($node instanceof Break_) {
+			BreakVisitor::enterNode($node);
+		}
+
+		if ($node instanceof Continue_) {
+			ContinueVisitor::enterNode($node);
+		}
 	}
 
 	/**
@@ -253,6 +265,10 @@ class Evaluator extends NodeVisitorAbstract
 			ArrayVisitor::leaveNode($node);
 		} elseif ($node instanceof ArrayDimFetch) {
 			ArrayDimFetchVisitor::leaveNode($node);
+		} elseif ($node instanceof Break_) {
+			BreakVisitor::leaveNode($node);
+		} elseif ($node instanceof Continue_) {
+			ContinueVisitor::leaveNode($node);
 		} elseif (
 			$node instanceof Variable
 			|| $node instanceof Scalar
