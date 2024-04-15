@@ -18,7 +18,9 @@ use FormsComputedLanguage\Visitors\ArrayVisitor;
 use FormsComputedLanguage\Visitors\AssignOpVisitor;
 use FormsComputedLanguage\Visitors\AssignVisitor;
 use FormsComputedLanguage\Visitors\BinaryOpVisitor;
+use FormsComputedLanguage\Visitors\BreakVisitor;
 use FormsComputedLanguage\Visitors\ConstFetchVisitor;
+use FormsComputedLanguage\Visitors\ContinueVisitor;
 use FormsComputedLanguage\Visitors\ElseIfVisitor;
 use FormsComputedLanguage\Visitors\ElseVisitor;
 use FormsComputedLanguage\Visitors\ExecutionChangeExceptions\ExecutionChangeException;
@@ -46,6 +48,8 @@ use PhpParser\Node\Expr\UnaryPlus;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar;
+use PhpParser\Node\Stmt\Break_;
+use PhpParser\Node\Stmt\Continue_;
 use PhpParser\Node\Stmt\Else_;
 use PhpParser\Node\Stmt\ElseIf_;
 use PhpParser\Node\Stmt\Expression;
@@ -95,13 +99,26 @@ class Evaluator extends NodeVisitorAbstract
 
 		/**
 		 * If this node is part of an if/elseif/else block, we need to be careful:
-		 * the 'if' condition should be evaluated always; 'elseif' conditions should be evaluated only if every previous condition in the block was false.
-		 * We calculate the condition value, and then push the value up to the parent so that we can know whether or not to execute the inner statements of the if/elseif/else block.
-		 * This check needs to happen when entering a node that's a condition or a statement as we traverse the AST recursively and don't return to the If block until all statements and conditions have been traversed.
-		 * To support this, we need to set up node relationship references when entering the If block, so that we know whether a particular statement is part of an if condition, a statement that should be executed if the if is true; and so on for elseifs and else.
+		 * 'if' condition should be evaluated always;
+		 * 'elseif' conditions should be evaluated only if every previous condition in the block was false.
+		 *
+		 * We calculate the condition value, and then push the value up to the parent
+		 * so that we can know whether to execute the inner statements of the if/elseif/else block.
+		 * This check needs to happen when entering a node that's a condition or a statement
+		 * as we traverse the AST recursively and don't return to the If block until all statements and conditions
+		 * have been traversed.
+		 *
+		 * To support this, we need to set up node relationship references when entering the If block,
+		 * so that we know whether a particular statement is part of an if condition,
+		 * a statement that should be executed if the 'if' is true; and so on for 'elseifs' and 'else'.
 		 * Similar tricks are used for the ternary operator.
-		 * We set a 'parentIf', 'parentElseif', 'parentTernary' attribute on the applicable child nodes with a reference to the parent node, and a 'parentIfRelationship' etc. attribute describing the relationship between the child and the parent.
-		 * On every if and elseif node that's not skipped (there haven't been any true conditions in the block previously) we set a 'condTruthy' attribute to indicate what does the condition evaluate to.
+		 *
+		 * We set a 'parentIf', 'parentElseif', 'parentTernary' attribute on the applicable child nodes
+		 * with a reference to the parent node, and a 'parentIfRelationship' etc. attribute
+		 * describing the relationship between the child and the parent.
+		 * On every if and elseif node that's not skipped
+		 * (there haven't been any true conditions in the block previously) we set a 'condTruthy' attribute
+		 * to indicate what does the condition evaluate to.
 		 */
 
 		$parentIf = $node->getAttribute('parentIf');
@@ -209,6 +226,14 @@ class Evaluator extends NodeVisitorAbstract
 				return $e->getChange();
 			}
 		}
+
+		if ($node instanceof Break_) {
+			BreakVisitor::enterNode($node);
+		}
+
+		if ($node instanceof Continue_) {
+			ContinueVisitor::enterNode($node);
+		}
 	}
 
 	/**
@@ -253,6 +278,10 @@ class Evaluator extends NodeVisitorAbstract
 			ArrayVisitor::leaveNode($node);
 		} elseif ($node instanceof ArrayDimFetch) {
 			ArrayDimFetchVisitor::leaveNode($node);
+		} elseif ($node instanceof Break_) {
+			BreakVisitor::leaveNode($node);
+		} elseif ($node instanceof Continue_) {
+			ContinueVisitor::leaveNode($node);
 		} elseif (
 			$node instanceof Variable
 			|| $node instanceof Scalar

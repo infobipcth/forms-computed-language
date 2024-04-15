@@ -14,6 +14,7 @@ use PhpParser\Node\Expr\BinaryOp\Greater;
 use PhpParser\Node\Expr\BinaryOp\GreaterOrEqual;
 use PhpParser\Node\Expr\BinaryOp\Minus;
 use PhpParser\Node\Expr\BinaryOp\Mul;
+use PhpParser\Node\Expr\BinaryOp\Mod;
 use PhpParser\Node\Expr\BinaryOp\NotEqual;
 use PhpParser\Node\Expr\BinaryOp\Plus;
 use PhpParser\Node\Expr\BinaryOp\Smaller;
@@ -62,6 +63,8 @@ class BinaryOpVisitor implements VisitorInterface
 			Stack::push(($lhs && $rhs));
 		} elseif ($node instanceof BooleanOr) {
 			Stack::push(($lhs || $rhs));
+		} elseif ($node instanceof Mod) {
+			Stack::push(($lhs % $rhs));
 		} else {
 			throw new UnknownTokenException("Unknown boolean operator {$nodeType} used");
 		}
