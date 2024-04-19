@@ -44,3 +44,19 @@ test('check that foreach with control flow works', function(){
     $this->languageRunner->evaluate();
     expect($this->languageRunner->getVars())->toBe(['a' => [0, 1, 4, 5, 6]]);
 });
+
+
+test('check that foreach with control flow works and array keys', function(){
+    $code = <<<'CODE'
+    $a = ['first' => 1, 'second' => 2];
+    foreach ($a as $index => $value) {
+        if ($index == 'first') {
+            $a[$index] = $value + 3;
+        }
+    }
+    CODE;
+    $this->languageRunner->setCode("$code");
+    $this->languageRunner->setVars([]);
+    $this->languageRunner->evaluate();
+    expect($this->languageRunner->getVars())->toBe(['a' => ['first' => 4, 'second' => 2]]);
+});
