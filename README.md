@@ -8,6 +8,7 @@ of PHP tokens in a safe manner in PHP.
 
 ## Supported features and tokens
 * Basic variables (numeric, boolean and string types)
+* Arrays and `foreach` loops without references
 * Fetching constants from PHP
 * Arithmetic and logical operators (`+, -, /, *, !, &&, ||`)
 * Assignment operators (`+=, .=` etc.)
@@ -19,7 +20,6 @@ of PHP tokens in a safe manner in PHP.
 
 
 ## Notably missing or different
-* Arrays can't be defined or manipulated with using FCL, apart from arrays that are defined during VM initialization (which can be counted and checked to see if an entry exists)
 * `++`, `--` and `===` operators (an easy PR :))
 * `switch` and `match` blocks
 * User-defined functions
@@ -27,12 +27,14 @@ of PHP tokens in a safe manner in PHP.
 * References and unpacking
 * Superglobals (`$_GET` etc.)
 * Output to stdout, files etc. (you can not echo anything)
+* Anonymous arrays in loops (e.g. `foreach([1, 2, 3] as $value){...}`)
+* Breaking out of foreach loops with 
 
 ## Running FCL code
 
 Basic example:
 ```php
-$lr = new LanguageRunner;
+$lr = LanguageRunner::getInstance();
 $lr->setCode('$a = round($a);');
 $lr->setVars(['a' => 3.14]);
 $lr->evaluate();
@@ -46,7 +48,7 @@ To mitigate this, you can provide a list of allowed or disallowed constants to t
 
 Blacklist example:
 ```php
-$lr = new LanguageRunner;
+$lr = LanguageRunner::getInstance();
 $lr->setCode('$a = DB_USER;');
 $lr->setVars([]);
 $lr->setDisallowedConstants(['DB_USER', 'DB_HOST', 'DB_PASSWORD', 'DB_NAME']);
@@ -59,7 +61,7 @@ var_dump($lr->getVars());
 
 Whitelist example:
 ```php
-$lr = new LanguageRunner;
+$lr = LanguageRunner::getInstance();
 $lr->setCode('$a = DB_USER;');
 $lr->setVars([]);
 $lr->setAllowedConstants(['true', 'false']);
@@ -72,7 +74,7 @@ var_dump($lr->getVars());
 
 Misconfiguration example - DO NOT USE!:
 ```php
-$lr = new LanguageRunner;
+$lr = LanguageRunner::getInstance();
 $lr->setCode('$a = DB_USER;');
 $lr->setVars([]);
 // wrong wrong wrong

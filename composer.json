@@ -1,26 +1,42 @@
 {
-    "name": "webadminsib/forms-computed-language",
+    "name": "infobipcth/forms-computed-language",
     "type": "project",
     "autoload": {
         "psr-4": {
             "FormsComputedLanguage\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Mario Borna Mjertan",
             "email": "marioborna.mjertan@infobip.com"
+        },
+        {
+            "name": "Denis Žoljom",
+            "email": "denis.zoljom@infobip.com"
         }
     ],
     "require": {
+        "php": "^8.2",
         "nikic/php-parser": "^4.17"
     },
     "require-dev": {
-        "pestphp/pest": "^2.28"
+      "squizlabs/php_codesniffer": "^3.9",
+      "pestphp/pest": "^2.28"
     },
     "config": {
         "allow-plugins": {
             "pestphp/pest-plugin": true
         }
+    },
+    "scripts": {
+      "test:standards": "vendor/bin/phpcs",
+      "test:unit": "@php ./vendor/bin/pest",
+      "test:coverage": "@php -dxdebug.mode=coverage ./vendor/bin/pest --coverage"
     }
 }
