@@ -26,8 +26,7 @@ class CountSelectedItems
             throw new ArgumentCountException("the countSelectedItems() function called with {$argc} arguments, but has one required argument and no optional arguments");
         }
         if (!is_array($args[0])) {
-            $type = gettype($args[0]);
-            throw new TypeException("countSelectedItems() called with {$type} as first argument, requires an array");
+            return 0;
         }
         return count($args[0]);
     }
