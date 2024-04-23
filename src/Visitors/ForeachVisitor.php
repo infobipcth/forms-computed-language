@@ -22,6 +22,7 @@ class ForeachVisitor implements VisitorInterface
 		$isolatedLoopContextTraverser = new NodeTraverser(); // we need a new NodeTraverser for a foreach block.
 		$isolatedLoopContextEvaluator = LanguageRunner::getEvaluator(); // returns a copy of the current evaluator.
 		$isolatedLoopContextTraverser->addVisitor($isolatedLoopContextEvaluator); // revisit the statements.
+
 		foreach ($iteratedArray as $iterationKey => $iterationValue) {
 			// set the iterator variables.
 			if ($node?->keyVar) {
