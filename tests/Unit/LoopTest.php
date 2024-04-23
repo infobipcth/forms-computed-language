@@ -45,7 +45,6 @@ test('check that foreach with control flow works', function(){
     expect($this->languageRunner->getVars())->toBe(['a' => [0, 1, 4, 5, 6]]);
 });
 
-
 test('check that foreach with control flow works and array keys', function(){
     $code = <<<'CODE'
     $a = ['first' => 1, 'second' => 2];
@@ -59,4 +58,20 @@ test('check that foreach with control flow works and array keys', function(){
     $this->languageRunner->setVars([]);
     $this->languageRunner->evaluate();
     expect($this->languageRunner->getVars())->toBe(['a' => ['first' => 4, 'second' => 2]]);
+});
+
+test('check that foreach with assignment inside the loop works', function(){
+    $code = <<<'CODE'
+    $a = ['first' => 1, 'second' => 2];
+
+    foreach ($a as $index => $value) {
+        if ($index == 'first') {
+            $b[] = $value + 3;
+        }
+    }
+    CODE;
+    $this->languageRunner->setCode("$code");
+    $this->languageRunner->setVars([]);
+    $this->languageRunner->evaluate();
+    expect($this->languageRunner->getVars())->toBe(['a' => ['first' => 1, 'second' => 2], 'b' => [4]]);
 });
