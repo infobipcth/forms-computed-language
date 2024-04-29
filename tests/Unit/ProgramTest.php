@@ -28,7 +28,7 @@ test('evaluating complex program works with continue statement', function () {
     $ppm = $cost / $volume;
 
     foreach ($prices as $priceData) {
-        if ($priceData['CountryName'] !== $country) {
+        if ($priceData['CountryName'] != $country) {
             continue;
         }
 
