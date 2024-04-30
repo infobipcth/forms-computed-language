@@ -3,6 +3,7 @@
 namespace FormsComputedLanguage\Visitors;
 
 use FormsComputedLanguage\Exceptions\UnknownFunctionException;
+use FormsComputedLanguage\Functions\Abs;
 use FormsComputedLanguage\Functions\CountSelectedItems;
 use FormsComputedLanguage\Functions\IsSelected;
 use FormsComputedLanguage\Functions\Round;
@@ -18,6 +19,7 @@ class FuncCallVisitor implements VisitorInterface
 		'round' => [Round::class, 'run'],
 		'countSelectedItems' => [CountSelectedItems::class, 'run'],
 		'isSelected' => [IsSelected::class, 'run'],
+		'abs' => [Abs::class, 'run'],
 	];
 
 	public static function enterNode(Node &$node)
