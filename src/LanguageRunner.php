@@ -36,7 +36,7 @@ class LanguageRunner implements LanguageRunnerInterface
 	 */
 	public function __construct()
 	{
-		static::$parser = (new ParserFactory())->create(3);
+		static::$parser = (new ParserFactory())->createForHostVersion();
 	}
 
 	public static function getInstance(): LanguageRunner
