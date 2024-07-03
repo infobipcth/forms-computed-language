@@ -24,7 +24,7 @@ class VariableStore
 	 */
 	public static function getVariables(string $contextHandle = 'global'): ?array
 	{
-		return static::$variables[$contextHandle];
+		return static::$variables[$contextHandle] ?? null;
 	}
 
 	/**
@@ -73,7 +73,7 @@ class VariableStore
 	 */
 	public static function getArrayVariable(string $arrayName, $arrayKey, string $contextHandle = 'global')
 	{
-		return static::$variables[$contextHandle][$arrayName][$arrayKey];
+		return static::$variables[$contextHandle][$arrayName][$arrayKey] ?? '';
 	}
 
 	/**
@@ -84,7 +84,7 @@ class VariableStore
 	 */
 	public static function getVariable(string $name, string $contextHandle = 'global')
 	{
-		return static::$variables[$contextHandle][$name];
+		return static::$variables[$contextHandle][$name] ?? '';
 	}
 
 
