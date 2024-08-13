@@ -18,15 +18,14 @@ class ConstFetchVisitor implements VisitorInterface
 
 	public static function leaveNode(Node &$node)
 	{
-		$constfqn = Helpers::getFqnFromParts($node->name->parts);
-		if (!Harness::getConstantsConfiguration()->canAccessConstant($constfqn)) {
+		if (!Harness::getConstantsConfiguration()->canAccessConstant($node->name->name)) {
 			// Check the constants config to ensure constant access is allowed.
-			throw new UndeclaredVariableUsageException("Tried to get the value of disallowed constant {$constfqn}");
+			throw new UndeclaredVariableUsageException("Tried to get the value of disallowed constant {$node->name->name}");
 		}
 		try {
-			Stack::push(constant($constfqn));
+			Stack::push(constant($node->name->name));
 		} catch (Error) {
-			throw new UndeclaredVariableUsageException("Tried to get the value of undefined constant {$constfqn}");
+			throw new UndeclaredVariableUsageException("Tried to get the value of undefined constant {$node->name->name}");
 		}
 	}
 }
