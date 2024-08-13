@@ -51,7 +51,7 @@ class Harness
 		static::$constantsConfiguration = $_constantsConfiguration;
 	}
 
-	public static function &getConstantsConfiguration(): ConstantsConfiguration
+	public static function getConstantsConfiguration(): ConstantsConfiguration
 	{
 		if (!isset(static::$constantsConfiguration)) {
 			static::$constantsConfiguration = new ConstantsConfiguration();
