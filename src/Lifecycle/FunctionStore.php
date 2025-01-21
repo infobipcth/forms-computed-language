@@ -11,7 +11,8 @@ use FormsComputedLanguage\Visitors\FuncCallVisitor;
  * Storage for callee-defined functions. Statically defined and global, provided by the calling program.
  * Can not be user-defined.
  */
-class FunctionStore {
+class FunctionStore
+{
 	/**
 	 * All defined functions. Must implement FunctionInterface.
 	 *
@@ -19,7 +20,8 @@ class FunctionStore {
 	 */
 	private static array $functions = [];
 
-	public static function addFunction(string $functionName, FunctionInterface $function) {
+	public static function addFunction(string $functionName, FunctionInterface $function)
+	{
 		// We need to check callee-defined functions as well as built-in functions.
 		$existingFunctions = self::getFunctionList();
 
@@ -30,11 +32,13 @@ class FunctionStore {
 		static::$functions[$functionName] = $function;
 	}
 
-	public static function getFunctionList() {
+	public static function getFunctionList()
+	{
 		return array_keys(static::$functions) + array_keys(FuncCallVisitor::FUNCTION_CALLBACKS);
 	}
 
-	public static function runFunction(string $functionName, array $args) {
+	public static function runFunction(string $functionName, array $args)
+	{
 		if (isset(static::$functions[$functionName])) {
 			return static::$functions[$functionName]->run($args);
 		}
