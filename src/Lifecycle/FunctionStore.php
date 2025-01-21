@@ -21,13 +21,17 @@ class FunctionStore {
 
 	public static function addFunction(string $functionName, FunctionInterface $function) {
 		// We need to check callee-defined functions as well as built-in functions.
-		$existingFunctions = array_keys(static::$functions) + array_keys(FuncCallVisitor::FUNCTION_CALLBACKS);
+		$existingFunctions = self::getFunctionList();
 
 		if (in_array($functionName, $existingFunctions, true)) {
 			throw new FunctionRedeclarationException("Function {$functionName} already declared, can not redeclare.");
 		}
 
 		static::$functions[$functionName] = $function;
+	}
+
+	public static function getFunctionList() {
+		return array_keys(static::$functions) + array_keys(FuncCallVisitor::FUNCTION_CALLBACKS);
 	}
 
 	public static function runFunction(string $functionName, array $args) {
