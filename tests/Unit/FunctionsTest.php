@@ -5,6 +5,9 @@ namespace Tests\Unit;
 use FormsComputedLanguage\Exceptions\ArgumentCountException;
 use FormsComputedLanguage\Exceptions\TypeException;
 use FormsComputedLanguage\Exceptions\UnknownFunctionException;
+use FormsComputedLanguage\Lifecycle\FunctionStore;
+use FormsComputedLanguage\Functions\FunctionInterface;
+use FormsComputedLanguage\Exceptions\FunctionRedeclarationException;
 
 /** Defined functions work */
 test('round works', function () {
@@ -101,4 +104,33 @@ test('Function call to undefined function throws UnknownFunctionException', func
 	$this->languageRunner->setCode('randomFunction("bla");');
 	$this->languageRunner->setVars([]);
 	expect(fn() => $this->languageRunner->evaluate())->toThrow(UnknownFunctionException::class);
+});
+
+test('Functions can be declared and run properly', function () {
+	$testFunction = new class implements FunctionInterface {
+		public static function run(array $args) {
+			return $args[0] + $args[1];
+		}
+	};
+
+	FunctionStore::addFunction('testFunction', $testFunction);
+	$this->languageRunner->setCode('$a = testFunction(1, 2);');
+	$this->languageRunner->evaluate();
+	expect($this->languageRunner->getVars())->toBe(['a' => 3]);
+});
+
+test('Callee-defined functions cannot be redeclared', function () {
+	expect(fn() => FunctionStore::addFunction('testFunction', new class implements FunctionInterface {
+		public static function run(array $args) {
+			return $args[0] + $args[1];
+		}
+	}))->toThrow(FunctionRedeclarationException::class);
+});
+
+test('Standard library-defined functions cannot be redeclared', function () {
+	expect(fn() => FunctionStore::addFunction('countSelectedItems', new class implements FunctionInterface {
+		public static function run(array $args) {
+			return $args[0] + $args[1];
+		}
+	}))->toThrow(FunctionRedeclarationException::class);
 });
