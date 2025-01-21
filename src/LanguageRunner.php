@@ -162,28 +162,4 @@ class LanguageRunner implements LanguageRunnerInterface
 	{
 		return VariableStore::getVariables();
 	}
-
-	/**
-	 * Get the constant behaviour settings.
-	 * @deprecated Use Harness::getConstantsConfiguration() instead.
-	 *
-	 * @return array Constant behaviour settings.
-	 */
-	public function getConstantBehaviour()
-	{
-		return Harness::getConstantsConfiguration()->behaviour ?? [];
-	}
-
-	/**
-	 * Set the constant behaviour settings. Dangerous: only call when bootstrapping a context-isolated language runner.
-	 * @param array $constantSettings The constant settings array.
-	 * @noinspection PhpInconsistentReturnPointsInspection
-	 * @deprecated Use ConstantsConfiguration methods instead.
-	 */
-	public function setConstantSettings(array $constantSettings)
-	{
-		Harness::getConstantsConfiguration()->setConstantBehaviour($constantSettings['behaviour']);
-		Harness::getConstantsConfiguration()->setAllowedConstants($constantSettings['allow']);
-		Harness::getConstantsConfiguration()->setDisallowedConstants($constantSettings['disallow']);
-	}
 }

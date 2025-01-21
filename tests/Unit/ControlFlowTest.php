@@ -30,10 +30,10 @@ test('only the first valid elseif is executed', function() {
     if ($a < 0) {
         $a = $a * -1;
     }
-    elseif ($a < 2) {
+    elseif ($a < 5) {
         $a = $a + 2;
     }
-    elseif ($b < 0) {
+    elseif ($b > 0) {
         $b = 100;
     }
     elseif ($c < 0) {
@@ -45,9 +45,9 @@ test('only the first valid elseif is executed', function() {
     CODE);
     $this->languageRunner->evaluate();
     expect($this->languageRunner->getVars())->toBe([
-        'a' => 3,
+        'a' => 5,
         'b' => 4,
-        'c' => 7,
+        'c' => -7,
         'd' => 2,
     ]);
 });
