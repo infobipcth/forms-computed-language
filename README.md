@@ -91,3 +91,31 @@ var_dump($lr->getVars());
 You can write FCL code similarly as you would write PHP. You can use all of the defined tokens, `if` for flow control and call our functions.
 
 The single notable difference is that FCL does not require an opening tag (no need to write `<?php`).
+
+## Defining callee-provided functions
+
+Users can not define functions, but the calling program can define additional functions that are available to users.
+These are shared across all language runner instances, and aren't isolated in any way.
+
+Rules:
+1. you can not redeclare functions
+2. you can not override standard library functions
+3. you always get an array of arguments
+4. you need to throw `ArgumentCountException` if the count of args is wrong
+5. you need to throw `TypeException` if argument type is wrong
+
+Example:
+```php
+  $testFunction = new class implements FunctionInterface {
+		public static function run(array $args) {
+      if (count($args) !== 2) {
+        throw new ArgumentCountException("I need exactly two args");
+      }
+			return $args[0] + $args[1];
+		}
+	};
+
+	FunctionStore::addFunction('testFunction', $testFunction);
+	$this->languageRunner->setCode('$a = testFunction(1, 2);');
+	$this->languageRunner->evaluate();
+```
