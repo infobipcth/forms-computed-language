@@ -26,7 +26,7 @@ class FunctionStore
 		$existingFunctions = self::getFunctionList();
 
 		if (in_array($functionName, $existingFunctions, true)) {
-			throw new FunctionRedeclarationException("Function {$functionName} already declared, can not redeclare.");
+			throw new FunctionRedeclarationException("Function {$functionName} already declared, cannot redeclare.");
 		}
 
 		static::$functions[$functionName] = $function;
