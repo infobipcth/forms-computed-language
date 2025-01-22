@@ -7,6 +7,7 @@ use FormsComputedLanguage\Functions\Abs;
 use FormsComputedLanguage\Functions\CountSelectedItems;
 use FormsComputedLanguage\Functions\IsSelected;
 use FormsComputedLanguage\Functions\Round;
+use FormsComputedLanguage\Lifecycle\FunctionStore;
 use FormsComputedLanguage\Lifecycle\Stack;
 use PhpParser\Node;
 
@@ -15,7 +16,7 @@ class FuncCallVisitor implements VisitorInterface
 	/**
 	 * Callbacks to run for available functions.
 	 */
-	private const FUNCTION_CALLBACKS = [
+	public const FUNCTION_CALLBACKS = [
 		'round' => [Round::class, 'run'],
 		'countSelectedItems' => [CountSelectedItems::class, 'run'],
 		'isSelected' => [IsSelected::class, 'run'],
@@ -34,6 +35,7 @@ class FuncCallVisitor implements VisitorInterface
 		} else {
 			$functionName = $node->name->getParts()[0];
 		}
+
 		$argv = [];
 		foreach ($node->args as $ignored) {
 			$argv[] = Stack::pop();
@@ -41,10 +43,14 @@ class FuncCallVisitor implements VisitorInterface
 
 		$argv = array_reverse($argv);
 
-		if (!isset(self::FUNCTION_CALLBACKS[$functionName])) {
-			throw new UnknownFunctionException("Undefined function {$functionName} called");
-		}
+		try {
+			if (!isset(self::FUNCTION_CALLBACKS[$functionName])) {
+				throw new UnknownFunctionException("Undefined function {$functionName} called");
+			}
 
-		Stack::push(call_user_func_array(self::FUNCTION_CALLBACKS[$functionName], [$argv]));
+			Stack::push(call_user_func_array(self::FUNCTION_CALLBACKS[$functionName], [$argv]));
+		} catch (UnknownFunctionException $e) {
+			Stack::push(FunctionStore::runFunction($functionName, $argv));
+		}
 	}
 }
