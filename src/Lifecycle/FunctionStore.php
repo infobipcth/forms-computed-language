@@ -81,10 +81,6 @@ class FunctionStore
 			return static::$functions[$functionName]->run($args);
 		}
 
-		if (isset(FuncCallVisitor::FUNCTION_CALLBACKS[$functionName])) {
-			return call_user_func_array(FuncCallVisitor::FUNCTION_CALLBACKS[$functionName], [$args]);
-		}
-
 		throw new UnknownFunctionException("Undefined function {$functionName} called");
 	}
 }
