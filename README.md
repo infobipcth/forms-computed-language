@@ -94,28 +94,49 @@ The single notable difference is that FCL does not require an opening tag (no ne
 
 ## Defining callee-provided functions
 
-Users can not define functions, but the calling program can define additional functions that are available to users.
+Users can not define functions on the fly, but the calling program can define additional functions that are available to users.
 These are shared across all language runner instances, and aren't isolated in any way.
 
 Rules:
-1. you can not redeclare functions
-2. you can not override standard library functions
-3. you always get an array of arguments
-4. you need to throw `ArgumentCountException` if the count of args is wrong
-5. you need to throw `TypeException` if argument type is wrong
+1. You can not redeclare functions
+2. You can not override standard library functions
+3. You always get an array of arguments
+4. You need to throw `FormsComputedLanguage\Exceptions\ArgumentCountException` if the count of args is wrong
+5. You need to throw `FormsComputedLanguage\Exceptions\TypeException` if argument type is wrong
 
 Example:
 ```php
-  $testFunction = new class implements FunctionInterface {
-		public static function run(array $args) {
-      if (count($args) !== 2) {
-        throw new ArgumentCountException("I need exactly two args");
-      }
-			return $args[0] + $args[1];
-		}
-	};
+<?php
 
-	FunctionStore::addFunction('testFunction', $testFunction);
-	$this->languageRunner->setCode('$a = testFunction(1, 2);');
-	$this->languageRunner->evaluate();
+namespace MyCustomFunctions;
+
+use FormsComputedLanguage\Functions\FunctionInterface;
+use FormsComputedLanguage\Exceptions\ArgumentCountException;
+use FormsComputedLanguage\Exceptions\TypeException;
+
+
+$testFunction = new class implements FunctionInterface {
+	public const string FUNCTION_NAME = 'testFunction';
+
+	public const array ARGUMENTS = [
+		'$firstNum' => 'int|float',
+		'$secondNum' => 'int|float',
+	];
+
+	public static function run(array $args) {
+		if (count($args) !== 2) {
+			throw new ArgumentCountException("The function expects exactly two arguments!");
+		}
+
+		if (!is_numeric($args[0]) || !is_numeric($args[1])) {
+			throw new TypeException("The function arguments must be numeric!");
+		}
+
+		return $args[0] + $args[1];
+	}
+};
+
+FunctionStore::addFunction($testFunction::FUNCTION_NAME, $testFunction);
+$this->languageRunner->setCode('$a = testFunction(1, 2);');
+$this->languageRunner->evaluate();
 ```
