@@ -108,12 +108,27 @@ test('Function call to undefined function throws UnknownFunctionException', func
 
 test('Functions can be declared and run properly', function () {
 	$testFunction = new class implements FunctionInterface {
+		public const string FUNCTION_NAME = 'testFunction';
+
+		public static function getName(): string
+		{
+			return self::FUNCTION_NAME;
+		}
+
+		public static function getArguments(): array
+		{
+			return [
+				'$firstNum' => 'int|float',
+				'$secondNum' => 'int|float',
+			];
+		}
+
 		public static function run(array $args) {
 			return $args[0] + $args[1];
 		}
 	};
 
-	FunctionStore::addFunction('testFunction', $testFunction);
+	FunctionStore::addFunction($testFunction::FUNCTION_NAME, $testFunction);
 	$this->languageRunner->setCode('$a = testFunction(1, 2);');
 	$this->languageRunner->evaluate();
 	expect($this->languageRunner->getVars())->toBe(['a' => 3]);
@@ -121,6 +136,21 @@ test('Functions can be declared and run properly', function () {
 
 test('Callee-defined functions cannot be redeclared', function () {
 	expect(fn() => FunctionStore::addFunction('testFunction', new class implements FunctionInterface {
+		public const string FUNCTION_NAME = 'testFunction';
+
+		public static function getName(): string
+		{
+			return self::FUNCTION_NAME;
+		}
+
+		public static function getArguments(): array
+		{
+			return [
+				'$firstNum' => 'int|float',
+				'$secondNum' => 'int|float',
+			];
+		}
+
 		public static function run(array $args) {
 			return $args[0] + $args[1];
 		}
@@ -129,8 +159,34 @@ test('Callee-defined functions cannot be redeclared', function () {
 
 test('Standard library-defined functions cannot be redeclared', function () {
 	expect(fn() => FunctionStore::addFunction('countSelectedItems', new class implements FunctionInterface {
+		public const string FUNCTION_NAME = 'countSelectedItems';
+
+		public static function getName(): string
+		{
+			return self::FUNCTION_NAME;
+		}
+
+		public static function getArguments(): array
+		{
+			return [
+				'$value' => 'array',
+			];
+		}
+
 		public static function run(array $args) {
 			return $args[0] + $args[1];
 		}
 	}))->toThrow(FunctionRedeclarationException::class);
+});
+
+test('calling getFunctionList will return an array of function names', function () {
+	expect(FunctionStore::getFunctionList())
+		->toBeArray()
+		->toContain('abs', 'isSelected');
+});
+
+test('calling getFunctionsWithArgumentList will return an array of function names with arguments', function () {
+	expect(FunctionStore::getFunctionsWithArgumentList())
+		->toBeArray()
+		->toContain('round(int|float $num, int $precision = 0, int $mode = 1)', 'countSelectedItems(array $value)', 'isSelected(array $haystack, mixed $needle)', 'abs(int|float $num)');
 });

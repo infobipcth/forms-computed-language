@@ -20,7 +20,7 @@ class FunctionStore
 	 */
 	private static array $functions = [];
 
-	public static function addFunction(string $functionName, FunctionInterface $function)
+	public static function addFunction(string $functionName, FunctionInterface $function): void
 	{
 		// We need to check callee-defined functions as well as built-in functions.
 		$existingFunctions = self::getFunctionList();
@@ -32,19 +32,53 @@ class FunctionStore
 		static::$functions[$functionName] = $function;
 	}
 
-	public static function getFunctionList()
+	public static function getFunctionList(): array
 	{
 		return array_keys(static::$functions) + array_keys(FuncCallVisitor::FUNCTION_CALLBACKS);
+	}
+
+	public static function getFunctionsWithArgumentList(): array
+	{
+		$functions = static::$functions + FuncCallVisitor::FUNCTION_CALLBACKS;
+
+		$listOut = [];
+
+		foreach ($functions as $functionName => $functionCallbackInfo) {
+			/*
+			 * We have two cases to handle. Anonymous classes and regularly declared classes.
+			 * For anonymous classes the $functionCallbackInfo is an object, otherwise it's
+			 * an array containing the name of the class and run method name (callback).
+			 */
+			if (is_object($functionCallbackInfo)) {
+				$classToFetch = $functionCallbackInfo;
+			} elseif (is_array($functionCallbackInfo)) {
+				$classToFetch = $functionCallbackInfo[0];
+			} else {
+				// Skip if something weird.
+				continue;
+			}
+
+			$reflection = new \ReflectionClass($classToFetch);
+			$functionArgsMethod = $reflection->getMethod('getArguments');
+			$functionNameMethod = $reflection->getMethod('getName');
+			$functionName = $functionNameMethod->invoke(null);
+			$argumentList = $functionArgsMethod->invoke(null);
+
+			$signatureParts = [];
+			foreach ($argumentList as $arg => $type) {
+				$signatureParts[] = "$type $arg";
+			}
+
+			$listOut[] = $functionName . '(' . implode(', ', $signatureParts) . ')';
+		}
+
+		return $listOut;
 	}
 
 	public static function runFunction(string $functionName, array $args)
 	{
 		if (isset(static::$functions[$functionName])) {
 			return static::$functions[$functionName]->run($args);
-		}
-
-		if (isset(FuncCallVisitor::FUNCTION_CALLBACKS[$functionName])) {
-			return call_user_func_array(FuncCallVisitor::FUNCTION_CALLBACKS[$functionName], [$args]);
 		}
 
 		throw new UnknownFunctionException("Undefined function {$functionName} called");

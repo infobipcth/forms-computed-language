@@ -8,26 +8,43 @@ use FormsComputedLanguage\Exceptions\ArgumentCountException;
  * Run the isSelected() function, a wrapper over in_array.
  * Call: isSelected(array $array, string $option)
  */
-class IsSelected
+class IsSelected implements FunctionInterface
 {
-	public const FUNCTION_NAME = 'isSelected';
+	public const string FUNCTION_NAME = 'isSelected';
+
+	public static function getName(): string
+	{
+		return self::FUNCTION_NAME;
+	}
+
+	public static function getArguments(): array
+	{
+		return [
+			'$haystack' => 'array',
+			'$needle' => 'mixed',
+		];
+	}
 
 	/**
 	 * Run the isSelected() function.
 	 *
 	 * @param array $args Array of arguments.
 	 * @return bool Indicates whether the option is in the array of selected items.
+	 *
+	 * @throws ArgumentCountException
 	 */
-	public static function run($args)
+	public static function run(array $args): bool
 	{
 		$argc = (int)(count($args));
 		if ($argc !== 2) {
-			throw new ArgumentCountException("the isSelected() function called with {$argc} arguments, 
+			throw new ArgumentCountException("the isSelected() function called with {$argc} arguments,
 			but has exactly two required arguments");
 		}
+
 		if (!is_array($args[0])) {
 			return false;
 		}
+
 		return in_array($args[1], $args[0], true);
 	}
 }

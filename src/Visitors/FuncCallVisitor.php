@@ -16,7 +16,7 @@ class FuncCallVisitor implements VisitorInterface
 	/**
 	 * Callbacks to run for available functions.
 	 */
-	public const FUNCTION_CALLBACKS = [
+	public const array FUNCTION_CALLBACKS = [
 		'round' => [Round::class, 'run'],
 		'countSelectedItems' => [CountSelectedItems::class, 'run'],
 		'isSelected' => [IsSelected::class, 'run'],
