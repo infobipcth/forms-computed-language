@@ -110,10 +110,18 @@ test('Functions can be declared and run properly', function () {
 	$testFunction = new class implements FunctionInterface {
 		public const string FUNCTION_NAME = 'testFunction';
 
-		public const array ARGUMENTS = [
-			'$firstNum' => 'int|float',
-			'$secondNum' => 'int|float',
-		];
+		public static function getName(): string
+		{
+			return self::FUNCTION_NAME;
+		}
+
+		public static function getArguments(): array
+		{
+			return [
+				'$firstNum' => 'int|float',
+				'$secondNum' => 'int|float',
+			];
+		}
 
 		public static function run(array $args) {
 			return $args[0] + $args[1];
@@ -128,6 +136,21 @@ test('Functions can be declared and run properly', function () {
 
 test('Callee-defined functions cannot be redeclared', function () {
 	expect(fn() => FunctionStore::addFunction('testFunction', new class implements FunctionInterface {
+		public const string FUNCTION_NAME = 'testFunction';
+
+		public static function getName(): string
+		{
+			return self::FUNCTION_NAME;
+		}
+
+		public static function getArguments(): array
+		{
+			return [
+				'$firstNum' => 'int|float',
+				'$secondNum' => 'int|float',
+			];
+		}
+
 		public static function run(array $args) {
 			return $args[0] + $args[1];
 		}
@@ -136,6 +159,20 @@ test('Callee-defined functions cannot be redeclared', function () {
 
 test('Standard library-defined functions cannot be redeclared', function () {
 	expect(fn() => FunctionStore::addFunction('countSelectedItems', new class implements FunctionInterface {
+		public const string FUNCTION_NAME = 'countSelectedItems';
+
+		public static function getName(): string
+		{
+			return self::FUNCTION_NAME;
+		}
+
+		public static function getArguments(): array
+		{
+			return [
+				'$value' => 'array',
+			];
+		}
+
 		public static function run(array $args) {
 			return $args[0] + $args[1];
 		}

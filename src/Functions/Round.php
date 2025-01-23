@@ -9,25 +9,34 @@ use FormsComputedLanguage\Exceptions\TypeException;
  * Implements the round function.
  * Call: round(int|float $num, int $precision = 0, int $mode = PHP_ROUND_HALF_UP): float
  */
-class Round
+class Round implements FunctionInterface
 {
-	/** Function name */
 	public const string FUNCTION_NAME = 'round';
 
-	public const array ARGUMENTS = [
-		'$num' => 'int|float',
-		'$precision = 0' => 'int',
-		'$mode = 1' => 'int',
-	];
+	public static function getName(): string
+	{
+		return self::FUNCTION_NAME;
+	}
+
+	public static function getArguments(): array
+	{
+		return [
+			'$num' => 'int|float',
+			'$precision = 0' => 'int',
+			'$mode = 1' => 'int',
+		];
+	}
 
 	/**
 	 * Runs the Round function.
 	 *
 	 * @param array $args Array of arguments. See class docblock for signature.
 	 * @return float Rounded number.
-	 * @noinspection PhpInconsistentReturnPointsInspection
+	 *
+	 * @throws ArgumentCountException
+	 * @throws TypeException
 	 */
-	public static function run($args)
+	public static function run(array $args): float
 	{
 		$argc = (int)(count($args));
 		if ($argc <= 0 || $argc >= 4) {
@@ -36,18 +45,22 @@ class Round
 				but has one required argument and two optional arguments"
 			);
 		}
+
 		if (!is_numeric($args[0])) {
 			$type = gettype($args[0]);
 			throw new TypeException("round() called with {$type} as first argument, requires a numeric argument");
 		}
+
 		if (isset($args[1]) && !is_int($args[1])) {
 			$type = gettype($args[1]);
 			throw new TypeException("round() called with {$type} as second argument, requires an int");
 		}
+
 		if (isset($args[2]) && !is_int($args[2])) {
 			$type = gettype($args[2]);
 			throw new TypeException("round() called with {$type} as third argument, requires an int");
 		}
+
 		switch ($argc) {
 			case 1:
 				return round($args[0]);

@@ -118,10 +118,18 @@ use FormsComputedLanguage\Exceptions\TypeException;
 $testFunction = new class implements FunctionInterface {
 	public const string FUNCTION_NAME = 'testFunction';
 
-	public const array ARGUMENTS = [
-		'$firstNum' => 'int|float',
-		'$secondNum' => 'int|float',
-	];
+	public static function getName(): string
+	{
+		return self::FUNCTION_NAME;
+	}
+
+	public static function getArguments(): array
+	{
+		return [
+			'$firstNum' => 'int|float',
+			'$secondNum' => 'int|float',
+		];
+	}
 
 	public static function run(array $args) {
 		if (count($args) !== 2) {

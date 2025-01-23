@@ -9,21 +9,32 @@ use FormsComputedLanguage\Exceptions\TypeException;
  * Implements the abs function.
  * Call: abs(int|float $num): int|float
  */
-class Abs
+class Abs implements FunctionInterface
 {
-	/** Function name */
 	public const string FUNCTION_NAME = 'abs';
 
-	public const array ARGUMENTS = ['$num' => 'int|float'];
+	public static function getName(): string
+	{
+		return self::FUNCTION_NAME;
+	}
+
+	public static function getArguments(): array
+	{
+		return [
+			'$num' => 'int|float'
+		];
+	}
 
 	/**
 	 * Runs the abs function.
 	 *
 	 * @param array $args Array of arguments. See class docblock for signature.
-	 * @return float The absolute value of number.
-	 * @noinspection PhpInconsistentReturnPointsInspection
+	 * @return int|float The absolute value of number.
+	 *
+	 * @throws TypeException
+	 * @throws ArgumentCountException
 	 */
-	public static function run($args)
+	public static function run(array $args): int|float
 	{
 		$argc = (int)(count($args));
 

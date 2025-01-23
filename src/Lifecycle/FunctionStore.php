@@ -45,24 +45,24 @@ class FunctionStore
 
 		foreach ($functions as $functionName => $functionCallbackInfo) {
 			/*
-			 * If $functionCallbackInfo is anonymously declared class (on the fly)
-			 * We'll need to do some magic in order to extract info from it.
+			 * We have two cases to handle. Anonymous classes and regularly declared classes.
+			 * For anonymous classes the $functionCallbackInfo is an object, otherwise it's
+			 * an array containing the name of the class and run method name (callback).
 			 */
 			if (is_object($functionCallbackInfo)) {
-				$reflection = new \ReflectionClass($functionCallbackInfo);
-				$argumentList = $reflection->getConstant('ARGUMENTS');
-				$functionName = $reflection->getConstant('FUNCTION_NAME');
-
-				$signatureParts = [];
-				foreach ($argumentList as $arg => $type) {
-					$signatureParts[] = "$type $arg";
-				}
-
-				$listOut[] = $functionName . '(' . implode(', ', $signatureParts) . ')';
+				$classToFetch = $functionCallbackInfo;
+			} elseif (is_array($functionCallbackInfo)) {
+				$classToFetch = $functionCallbackInfo[0];
+			} else {
+				// Skip if something weird.
 				continue;
 			}
 
-			$argumentList = constant("$functionCallbackInfo[0]::ARGUMENTS");
+			$reflection = new \ReflectionClass($classToFetch);
+			$functionArgsMethod = $reflection->getMethod('getArguments');
+			$functionNameMethod = $reflection->getMethod('getName');
+			$functionName = $functionNameMethod->invoke(null);
+			$argumentList = $functionArgsMethod->invoke(null);
 
 			$signatureParts = [];
 			foreach ($argumentList as $arg => $type) {
