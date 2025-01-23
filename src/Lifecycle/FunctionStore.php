@@ -20,7 +20,7 @@ class FunctionStore
 	 */
 	private static array $functions = [];
 
-	public static function addFunction(string $functionName, FunctionInterface $function)
+	public static function addFunction(string $functionName, FunctionInterface $function): void
 	{
 		// We need to check callee-defined functions as well as built-in functions.
 		$existingFunctions = self::getFunctionList();
@@ -32,9 +32,47 @@ class FunctionStore
 		static::$functions[$functionName] = $function;
 	}
 
-	public static function getFunctionList()
+	public static function getFunctionList(): array
 	{
 		return array_keys(static::$functions) + array_keys(FuncCallVisitor::FUNCTION_CALLBACKS);
+	}
+
+	public static function getFunctionsWithArgumentList(): array
+	{
+		$functions = static::$functions + FuncCallVisitor::FUNCTION_CALLBACKS;
+
+		$listOut = [];
+
+		foreach ($functions as $functionName => $functionCallbackInfo) {
+			/*
+			 * If $functionCallbackInfo is anonymously declared class (on the fly)
+			 * We'll need to do some magic in order to extract info from it.
+			 */
+			if (is_object($functionCallbackInfo)) {
+				$reflection = new \ReflectionClass($functionCallbackInfo);
+				$argumentList = $reflection->getConstant('ARGUMENTS');
+				$functionName = $reflection->getConstant('FUNCTION_NAME');
+
+				$signatureParts = [];
+				foreach ($argumentList as $arg => $type) {
+					$signatureParts[] = "$type $arg";
+				}
+
+				$listOut[] = $functionName . '(' . implode(', ', $signatureParts) . ')';
+				continue;
+			}
+
+			$argumentList = constant("$functionCallbackInfo[0]::ARGUMENTS");
+
+			$signatureParts = [];
+			foreach ($argumentList as $arg => $type) {
+				$signatureParts[] = "$type $arg";
+			}
+
+			$listOut[] = $functionName . '(' . implode(', ', $signatureParts) . ')';
+		}
+
+		return $listOut;
 	}
 
 	public static function runFunction(string $functionName, array $args)
