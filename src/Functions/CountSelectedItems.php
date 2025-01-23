@@ -12,6 +12,10 @@ class CountSelectedItems
 {
 	public const FUNCTION_NAME = 'countSelectedItems';
 
+	public const array ARGUMENTS = [
+		'$value' => 'array',
+	];
+
 	/**
 	 * Run the countSelectedItems() function
 	 *

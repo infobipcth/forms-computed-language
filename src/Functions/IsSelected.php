@@ -10,7 +10,12 @@ use FormsComputedLanguage\Exceptions\ArgumentCountException;
  */
 class IsSelected
 {
-	public const FUNCTION_NAME = 'isSelected';
+	public const string FUNCTION_NAME = 'isSelected';
+
+	public const array ARGUMENTS = [
+		'$haystack' => 'array',
+		'$needle' => 'mixed',
+	];
 
 	/**
 	 * Run the isSelected() function.
@@ -22,7 +27,7 @@ class IsSelected
 	{
 		$argc = (int)(count($args));
 		if ($argc !== 2) {
-			throw new ArgumentCountException("the isSelected() function called with {$argc} arguments, 
+			throw new ArgumentCountException("the isSelected() function called with {$argc} arguments,
 			but has exactly two required arguments");
 		}
 		if (!is_array($args[0])) {

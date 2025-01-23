@@ -12,7 +12,13 @@ use FormsComputedLanguage\Exceptions\TypeException;
 class Round
 {
 	/** Function name */
-	public const FUNCTION_NAME = 'round';
+	public const string FUNCTION_NAME = 'round';
+
+	public const array ARGUMENTS = [
+		'$num' => 'int|float',
+		'$precision = 0' => 'int',
+		'$mode = 1' => 'int',
+	];
 
 	/**
 	 * Runs the Round function.
@@ -26,7 +32,7 @@ class Round
 		$argc = (int)(count($args));
 		if ($argc <= 0 || $argc >= 4) {
 			throw new ArgumentCountException(
-				"the round() function called with {$argc} arguments, 
+				"the round() function called with {$argc} arguments,
 				but has one required argument and two optional arguments"
 			);
 		}

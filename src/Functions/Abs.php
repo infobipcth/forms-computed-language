@@ -12,7 +12,9 @@ use FormsComputedLanguage\Exceptions\TypeException;
 class Abs
 {
 	/** Function name */
-	public const FUNCTION_NAME = 'abs';
+	public const string FUNCTION_NAME = 'abs';
+
+	public const array ARGUMENTS = ['$num' => 'int|float'];
 
 	/**
 	 * Runs the abs function.
