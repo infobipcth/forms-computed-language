@@ -20,12 +20,16 @@ class ConstFetchVisitor implements VisitorInterface
 	{
 		if (!Harness::getConstantsConfiguration()->canAccessConstant($node->name->name)) {
 			// Check the constants config to ensure constant access is allowed.
-			throw new UndeclaredVariableUsageException("Tried to get the value of disallowed constant {$node->name->name}");
+			throw new UndeclaredVariableUsageException(
+				"Tried to get the value of disallowed constant {$node->name->name}"
+			);
 		}
 		try {
 			Stack::push(constant($node->name->name));
 		} catch (Error) {
-			throw new UndeclaredVariableUsageException("Tried to get the value of undefined constant {$node->name->name}");
+			throw new UndeclaredVariableUsageException(
+				"Tried to get the value of undefined constant {$node->name->name}"
+			);
 		}
 	}
 }
