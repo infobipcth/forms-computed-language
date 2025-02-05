@@ -190,3 +190,20 @@ test('calling getFunctionsWithArgumentList will return an array of function name
 		->toBeArray()
 		->toContain('round(int|float $num, int $precision = 0, int $mode = 1)', 'countSelectedItems(array $value)', 'isSelected(array $haystack, mixed $needle)', 'abs(int|float $num)');
 });
+
+test('number_format works', function() {
+	$this->languageRunner->setCode(<<<'CODE'
+	$rounded = number_format(5.1234);
+	$fivepointoh = number_format(5, 2);
+	$fivefifty = number_format(5.5, 2, ",", ".");
+	$hiljadeihiljade = number_format(100000, 2, ".", ",");
+	CODE);
+	$this->languageRunner->setVars([]);
+	$this->languageRunner->evaluate();
+	expect($this->languageRunner->getVars())->toBe([
+		'rounded' => '5',
+		'fivepointoh' => '5.00',
+		'fivefifty' => '5,50',
+		'hiljadeihiljade' => '100,000.00',
+	]);
+});
