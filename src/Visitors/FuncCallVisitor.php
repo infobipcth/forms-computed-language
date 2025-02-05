@@ -6,6 +6,7 @@ use FormsComputedLanguage\Exceptions\UnknownFunctionException;
 use FormsComputedLanguage\Functions\Abs;
 use FormsComputedLanguage\Functions\CountSelectedItems;
 use FormsComputedLanguage\Functions\IsSelected;
+use FormsComputedLanguage\Functions\NumberFormat;
 use FormsComputedLanguage\Functions\Round;
 use FormsComputedLanguage\Lifecycle\FunctionStore;
 use FormsComputedLanguage\Lifecycle\Stack;
@@ -21,6 +22,7 @@ class FuncCallVisitor implements VisitorInterface
 		'countSelectedItems' => [CountSelectedItems::class, 'run'],
 		'isSelected' => [IsSelected::class, 'run'],
 		'abs' => [Abs::class, 'run'],
+		'number_format' => [NumberFormat::class, 'run'],
 	];
 
 	public static function enterNode(Node &$node)
