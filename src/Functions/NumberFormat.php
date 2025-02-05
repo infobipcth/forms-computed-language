@@ -10,14 +10,17 @@ use FormsComputedLanguage\Exceptions\TypeException;
  * Call: number_format(int|float $num, int $decimals = 0, string $decimal = '.', string $thousands = ','): string
  */
 
-class NumberFormat implements FunctionInterface {
+class NumberFormat implements FunctionInterface
+{
 	public const string FUNCTION_NAME = 'number_format';
 
-	public static function getName(): string {
+	public static function getName(): string
+	{
 		return self::FUNCTION_NAME;
 	}
 
-	public static function getArguments(): array {
+	public static function getArguments(): array
+	{
 		return [
 			'$num' => 'int|float',
 			'$decimals = 0' => 'int',
@@ -35,7 +38,8 @@ class NumberFormat implements FunctionInterface {
 	 * @throws ArgumentCountException
 	 * @throws TypeException
 	 */
-	public static function run(array $args): string {
+	public static function run(array $args): string
+	{
 		$argc = (int)(count($args));
 		if ($argc <= 0 || $argc >= 5) {
 			throw new ArgumentCountException(
