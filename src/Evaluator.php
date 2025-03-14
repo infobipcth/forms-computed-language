@@ -19,6 +19,7 @@ use FormsComputedLanguage\Visitors\AssignOpVisitor;
 use FormsComputedLanguage\Visitors\AssignVisitor;
 use FormsComputedLanguage\Visitors\BinaryOpVisitor;
 use FormsComputedLanguage\Visitors\BreakVisitor;
+use FormsComputedLanguage\Visitors\CastVisitor;
 use FormsComputedLanguage\Visitors\ConstFetchVisitor;
 use FormsComputedLanguage\Visitors\ContinueVisitor;
 use FormsComputedLanguage\Visitors\ElseIfVisitor;
@@ -40,6 +41,7 @@ use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\AssignOp;
 use PhpParser\Node\Expr\BinaryOp;
 use PhpParser\Node\Expr\BooleanNot;
+use PhpParser\Node\Expr\Cast;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Ternary;
@@ -282,6 +284,8 @@ class Evaluator extends NodeVisitorAbstract
 			BreakVisitor::leaveNode($node);
 		} elseif ($node instanceof Continue_) {
 			ContinueVisitor::leaveNode($node);
+		} elseif ($node instanceof Cast) {
+			CastVisitor::leaveNode($node);
 		} elseif (
 			$node instanceof Variable
 			|| $node instanceof Scalar
