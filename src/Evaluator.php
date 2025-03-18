@@ -57,7 +57,7 @@ use PhpParser\Node\Stmt\ElseIf_;
 use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Foreach_;
 use PhpParser\Node\Stmt\If_;
-use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 
 /**
@@ -132,13 +132,15 @@ class Evaluator extends NodeVisitorAbstract
 			// If yes, then it's also a descentant of an If statement.
 
 			if ($parentIf->getAttribute('condTruthy')) { // Is the condition of the If block true?
-				return NodeTraverser::DONT_TRAVERSE_CHILDREN; // Don't evaluate this node nor its children.
+				$node->setAttribute('shouldEvaluate', false);
+				return NodeVisitor::DONT_TRAVERSE_CHILDREN; // Don't evaluate this node nor its children.
 			}
 
 			// Have we already evaluated an elseif statement?
 			// I.e., has there been a true elseif prior to this one in the block?
 			if ($parentIf->getAttribute('hasEvaluatedElifs') === true) {
-				return NodeTraverser::DONT_TRAVERSE_CHILDREN; // Don't evaluate this node nor its children.
+				$node->setAttribute('shouldEvaluate', false);
+				return NodeVisitor::DONT_TRAVERSE_CHILDREN; // Don't evaluate this node nor its children.
 			}
 
 			// Otherwise, what's the relationship between this node and its parent elseif?
@@ -147,7 +149,8 @@ class Evaluator extends NodeVisitorAbstract
 				// If it's a statement of the elseif and the condition is false,
 				// don't evaluate this node nor its children.
 				// In other words, skip the inner code in the elseif if the condition is false.
-				return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+				$node->setAttribute('shouldEvaluate', false);
+				return NodeVisitor::DONT_TRAVERSE_CHILDREN;
 			}
 
 			if ($parentElseif->getAttribute('condTruthy')) {
@@ -161,12 +164,14 @@ class Evaluator extends NodeVisitorAbstract
 			// What's the relationship to the ternary?
 			if ($parentTernary->getAttribute('condTruthy')) { // Is the parent ternary true?
 				if ($parentRelationship === 'else') { // If so, if this is the 'false' part of the ternary, skip it.
-					return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+					$node->setAttribute('shouldEvaluate', false);
+					return NodeVisitor::DONT_TRAVERSE_CHILDREN;
 				}
 			} else {
 				if ($parentRelationship === 'if') {
 					// If the parent ternary is false, and this is the 'true' part of the ternary, skip it.
-					return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+					$node->setAttribute('shouldEvaluate', false);
+					return NodeVisitor::DONT_TRAVERSE_CHILDREN;
 				}
 			}
 		}
@@ -176,7 +181,7 @@ class Evaluator extends NodeVisitorAbstract
 				!$parentIf->getAttribute('condTruthy')
 				&& $node->getAttribute('parentRelationship') === 'stmt'
 			) { // If the if condition is false and this node is a statement of the if, skip it.
-				return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+				return NodeVisitor::DONT_TRAVERSE_CHILDREN;
 			}
 		}
 
@@ -253,6 +258,11 @@ class Evaluator extends NodeVisitorAbstract
 	 */
 	public function leaveNode(Node $node)
 	{
+		if ($node->getAttribute('shouldEvaluate', true) === false) {
+			// If we shouldn't evaluate this node, skip it.
+			return;
+		}
+
 		$nodeType = get_class($node);
 
 		if ($node instanceof Assign) {
@@ -313,14 +323,14 @@ class Evaluator extends NodeVisitorAbstract
 				// If yes, its evaluation is on the top of the stack. We can push it up to the parent elseif,
 				// so statements inside it know whether to execute or not.
 				// Note that we are not popping the stack, simply looking at its top.
-				$parentElseif->setAttribute('condTruthy', Stack::peek());
+				$parentElseif->setAttribute('condTruthy', Stack::pop());
 			}
 		}
 
 		if ($parent = $node->getAttribute('parentIf')) { // Is this node a direct descentant of an If?
 			if ($node->getAttribute('parentRelationship') === 'cond') { // Is this node the condition of an If?
 				// Push the evaluation to the parent if.
-				$parent->setAttribute('condTruthy', Stack::peek());
+				$parent->setAttribute('condTruthy', Stack::pop());
 			}
 		}
 
@@ -329,7 +339,7 @@ class Evaluator extends NodeVisitorAbstract
 			if ($node->getAttribute('parentTernaryRelationship') === 'cond') {
 				// Is this node a condition of the ternary?
 				// Push the evaluation to the parent ternary node.
-				$parentTernary->setAttribute('condTruthy', Stack::peek());
+				$parentTernary->setAttribute('condTruthy', Stack::pop());
 			}
 		}
 
