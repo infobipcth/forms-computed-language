@@ -90,3 +90,25 @@ test('ternaries work', function () {
     $this->languageRunner->evaluate();
     expect($this->languageRunner->getVars())->toBe(['b' => 102, 'c' => 400]);
 });
+
+test('more complex ternaries work', function () {
+	$this->languageRunner->setCode('
+	$year1_overage = ($year1_answersMAS > $year1_mostSuitablePackage) ? ($year1_answersMAS - $year1_mostSuitablePackage) : 0;
+	$year2_overage = ($year2_answersMAS < $year2_mostSuitablePackage) ? ($year2_answersMAS - $year2_mostSuitablePackage) : 0;
+	');
+	$this->languageRunner->setVars([
+		'year1_answersMAS' => 10,
+		'year1_mostSuitablePackage' => 5,
+		'year2_answersMAS' => 10,
+		'year2_mostSuitablePackage' => 5,
+	]);
+	$this->languageRunner->evaluate();
+	expect($this->languageRunner->getVars())->toBe([
+		'year1_answersMAS' => 10,
+		'year1_mostSuitablePackage' => 5,
+		'year2_answersMAS' => 10,
+		'year2_mostSuitablePackage' => 5,
+		'year1_overage' => 5,
+		'year2_overage' => 0
+	]);
+});
