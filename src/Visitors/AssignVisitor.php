@@ -35,11 +35,14 @@ class AssignVisitor implements VisitorInterface
 			}
 		} else {
 			if (!($node->dim ?? false)) {
-				VariableStore::setVariable($node->var->name, Stack::pop());
+				$value = Stack::pop();
+				$name = Stack::pop();
+				VariableStore::setVariable($name, $value);
 			} else {
 				$arrayDim = Stack::pop();
 				$arrayVal = Stack::pop();
-				VariableStore::setArrayVariable($node->var->name, $arrayDim, $arrayVal);
+				$arrayName = Stack::pop();
+				VariableStore::setArrayVariable($arrayName, $arrayDim, $arrayVal);
 			}
 		}
 	}

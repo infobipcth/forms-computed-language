@@ -21,4 +21,11 @@
     <rule ref="Generic.WhiteSpace">
         <exclude name="Generic.WhiteSpace.DisallowTabIndent"/>
     </rule>
+
+	<rule ref="Generic.Files.LineLength">
+		<properties>
+			<property name="lineLimit" value="256"/>
+			<property name="absoluteLineLimit" value="256"/>
+		</properties>
+	</rule>
 </ruleset>
