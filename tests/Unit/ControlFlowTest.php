@@ -112,3 +112,34 @@ test('more complex ternaries work', function () {
 		'year2_overage' => 0
 	]);
 });
+
+test('missing else in the condition works', function () {
+	$this->languageRunner->setVars(['var' => 'a']);
+	$this->languageRunner->setCode(<<<'CODE'
+	$res = 0;
+	if ($var == 'a') {
+	  $res += 1;
+	} elseif ($var == 'b') {
+	  $res += 2;
+	}
+	CODE);
+
+	$this->languageRunner->evaluate();
+    expect($this->languageRunner->getVars())->toBe(['var' => 'a', 'res' => 1]);
+});
+
+test('missing else in the condition works second case', function () {
+	$this->languageRunner->setVars(['var' => 'b']);
+	$this->languageRunner->setCode(<<<'CODE'
+	$res = 0;
+	if ($var == 'a') {
+	  $res += 1;
+	} elseif ($var == 'b') {
+	  $res += 2;
+	}
+	CODE);
+
+	$this->languageRunner->evaluate();
+    expect($this->languageRunner->getVars())->toBe(['var' => 'b', 'res' => 2]);
+});
+
