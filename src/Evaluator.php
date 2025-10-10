@@ -241,6 +241,17 @@ class Evaluator extends NodeVisitorAbstract
 		if ($node instanceof Continue_) {
 			ContinueVisitor::enterNode($node);
 		}
+
+		/**
+		 * Coalesce is a binary operator, but also changes execution flow!
+		 * Coalesced variable lookups don't throw an error, meaningfully changing the execution flow if a variable is undefined.
+		 * We need to mark the LHS of a coalesce operation so that when we look up a variable, we know not to throw an error if it's undefined.
+		 * This is done in BinaryOpVisitor::enterNode for clarity, so that all Coalesce-related logic is in one place.
+		 * Mostly - as this attribute is checked in VariableVisitor when looking up a variable.
+		 */
+		if ($node instanceof BinaryOp) {
+			BinaryOpVisitor::enterNode($node);
+		}
 	}
 
 	/**

@@ -3,7 +3,6 @@
 namespace FormsComputedLanguage\Visitors;
 
 use FormsComputedLanguage\Lifecycle\Stack;
-use FormsComputedLanguage\Lifecycle\VariableStore;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Cast\Int_;
 use PhpParser\Node\Expr\Cast\Double;

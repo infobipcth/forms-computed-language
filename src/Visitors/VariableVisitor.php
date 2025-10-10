@@ -14,7 +14,7 @@ class VariableVisitor implements VisitorInterface
 		if ($node instanceof Variable) {
 			// If this node references a variable e.g. $x, push the variable value to the stack.
 			if (!($node->getAttribute('parentIsAssignment', false))) {
-				Stack::push(VariableStore::getVariable($node->name));
+				Stack::push(VariableStore::getVariable($node->name, shouldThrow: !($node->getAttribute('isCoalesceLHS', false) ?? false)));
 			} else {
 				Stack::push($node->name);
 			}
