@@ -68,7 +68,7 @@ $lr->setConstantBehaviour('whitelist');
 $lr->evaluate();
 ```
 
-### Blacklist Mode
+### Disallowlist Mode
 
 In this mode, all constants are allowed *except* for those you explicitly disallow.
 
