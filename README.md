@@ -68,7 +68,7 @@ $lr->evaluate();
 var_dump($lr->getVars());
 ```
 
-Whitelist example - throws an error when a non-whitelisted constant is accessed:
+Allowlist example - throws an error when a non-allowlisted constant is accessed:
 ```php
 $lr = LanguageRunner::getInstance();
 $lr->setCode('$a = DB_USER;');
