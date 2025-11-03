@@ -1,14 +1,14 @@
 {
     "name": "infobipcth/forms-computed-language",
     "type": "project",
-    "description": "A library for handling computed language in forms",
+    "description": "A PHP library for safely interpreting user-inputted arbitrary code, specifically designed for supporting logic in forms.",
     "keywords": [
         "infobip",
         "forms",
         "computed",
         "language"
     ],
-    "license": "proprietary",
+    "license": "MIT",
     "authors": [
         {
             "name": "Mario Borna Mjertan",
