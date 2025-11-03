@@ -121,4 +121,4 @@ array(
 )
 ```
 
-This output shows that the code is parsed as an `AssignOp_Plus` expression (the `+=` operator), which adds the number `1` to the variable `a`. This can be invaluable for debugging complex expressions or control structures.
+This output shows how assignment (`=`) and addition (`+`) are represented in the AST: `Expr_Assign` for assignment and `Expr_BinaryOp_Plus` for addition. This can be invaluable for debugging complex expressions or control structures.
