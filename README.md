@@ -1,13 +1,12 @@
 # Forms Computed Language
 
-Forms computed language (FCL) is a subset of PHP designed to be safe to execute when the code is arbitrary user input,
+Forms Computed Language (FCL) is an interpreted language designed to be safe to execute when the code is arbitrary user input,
 while allowing users to manipulate variables, use flow control features and run functions.
 
-It relies on @nikic/php-parser to produce an abstract syntax tree, and implements a "virtual machine" for evaluating a subset
-of PHP tokens in a safe manner in PHP.
+FCL is based on PHP syntax and relies on @nikic/php-parser to produce an abstract syntax tree, while reimplementing an evaluator for a subset of PHP's tokens in PHP itself.
 
 ## Supported features and tokens
-* Basic variables (numeric, boolean and string types)
+* Scalar variables (numeric, boolean and string types)
 * Arrays and `foreach` loops without references
 * Fetching constants from PHP
 * Arithmetic and logical operators (`+, -, /, *, !, &&, ||`)
@@ -16,23 +15,31 @@ of PHP tokens in a safe manner in PHP.
 * `if/elseif/else` blocks
 * The ternary `if ? then : else` operator
 * Unary plus and minus (e.g. `-1, +1` are valid)
-* Function calls to FCL-provided functions (currently, `countSelectedItems`, `round` and `isSelected`)
-
+* Function calls to FCL-provided functions (currently, `countSelectedItems`, `round` and `isSelected`) and `FunctionStore` functions
 
 ## Notably missing or different
 * `++`, `--` and `===` operators (an easy PR :))
 * `switch` and `match` blocks
-* User-defined functions
+* User-defined functions (developers integrating FCL can use `FunctionStore` to provide custom functions)
 * OOP and namespaces
 * References and unpacking
 * Superglobals (`$_GET` etc.)
-* Output to stdout, files etc. (you can not echo anything)
+* Output to stdio, files etc. (you can not echo anything)
 * Anonymous arrays in loops (e.g. `foreach([1, 2, 3] as $value){...}`)
-* Breaking out of foreach loops with 
+
+## Getting started
+
+You can install FCL using Composer by running a `composer require` command in your project:
+
+```bash
+composer require infobipcth/forms-computed-language
+```
+
+As with any other package, you can also install it by adding it manually to `composer.json` or installing it manually by downloading a release.
 
 ## Running FCL code
 
-Basic example:
+Basic example of running FCL code:
 ```php
 $lr = LanguageRunner::getInstance();
 $lr->setCode('$a = round($a);');
@@ -42,7 +49,9 @@ $lr->evaluate();
 var_dump($lr->getVars());
 ```
 
-**IMPORTANT SECURITY NOTE**: for booleans to work, and so that users can use constants such as `PHP_ROUND_UP` etc., you need to have some sort of access to constants (at least `true` and `false` constants). HOWEVER, if your project contains sensitive information in constants or PHP is exposing sensitive constants, this will prove to be a security risk!!
+## Constants and security
+
+**IMPORTANT SECURITY NOTE**: for booleans to work, and so that users can use constants such as `PHP_ROUND_UP` etc., you need to have some sort of access to constants (at least `true` and `false` constants). HOWEVER, if your project contains sensitive information in constants or PHP is exposing sensitive constants, this will prove to be a security risk!
 
 To mitigate this, you can provide a list of allowed or disallowed constants to the Language Runner prior to code evaluation.
 
@@ -59,7 +68,7 @@ $lr->evaluate();
 var_dump($lr->getVars());
 ```
 
-Whitelist example:
+Whitelist example - throws an error when a non-whitelisted constant is accessed:
 ```php
 $lr = LanguageRunner::getInstance();
 $lr->setCode('$a = DB_USER;');
@@ -90,12 +99,14 @@ var_dump($lr->getVars());
 ## Writing FCL code
 You can write FCL code similarly as you would write PHP. You can use all of the defined tokens, `if` for flow control and call our functions.
 
-The single notable difference is that FCL does not require an opening tag (no need to write `<?php`).
+A notable difference is that FCL does not require an opening tag (no need to write `<?php` or similar).
 
-## Defining callee-provided functions
+## Defining callee-provided functions (FunctionStore)
 
 Users can not define functions on the fly, but the calling program can define additional functions that are available to users.
-These are shared across all language runner instances, and aren't isolated in any way.
+These are shared across all language runner instances, and aren't isolated in any way. 
+
+You can do this in your project at any time prior to evaluating an FCL program.
 
 Rules:
 1. You can not redeclare functions
