@@ -9,9 +9,9 @@ class ConstantsConfiguration
 	private ?array $disallowedConstants;
 
 	/**
-	 * Set the constants blacklist.
+	 * Set the constants disallowlist.
 	 *
-	 * @param array $disallow Constants blacklist.
+	 * @param array $disallow Constants disallowlist.
 	 * @return void
 	 */
 	public function setDisallowedConstants(array $disallow): void
@@ -31,7 +31,7 @@ class ConstantsConfiguration
 	}
 
 	/**
-	 * Set to 'whitelist' to only allow whitelisted constants, or to 'blacklist' to allow all but blacklisted.
+	 * Set to 'whitelist' to only allow whitelisted constants, or to 'blacklist' to allow all but disallowedlisted.
 	 *
 	 * @param string|ConstantsBehaviour $type 'whitelist' or 'blacklist'.
 	 * @return void

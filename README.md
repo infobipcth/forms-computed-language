@@ -55,7 +55,7 @@ var_dump($lr->getVars());
 
 To mitigate this, you can provide a list of allowed or disallowed constants to the Language Runner prior to code evaluation.
 
-Blacklist example:
+Disallowlist example:
 ```php
 $lr = LanguageRunner::getInstance();
 $lr->setCode('$a = DB_USER;');
@@ -219,7 +219,7 @@ Tests are organized in the `tests/Unit/` directory and cover:
 - **CastingTest.php** - Type casting functionality
 - **ControlFlowTest.php** - If/elseif/else and ternary operators
 - **ControlStructuresTest.php** - Complex control structures
-- **DisallowBehaviorTest.php** - Constant whitelist/blacklist security
+- **DisallowBehaviorTest.php** - Constant allowlist/disallowlist security
 - **FunctionsTest.php** - Built-in and custom functions
 - **LoopTest.php** - Foreach loops and iteration
 - **OperatorsTest.php** - Arithmetic, logical, and comparison operators

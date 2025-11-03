@@ -50,9 +50,9 @@ class LanguageRunner implements LanguageRunnerInterface
 	}
 
 	/**
-	 * Set the constants blacklist.
+	 * Set the constants disallowlist.
 	 *
-	 * @param array $disallow Constants blacklist.
+	 * @param array $disallow Constants disallowlist.
 	 * @return void
 	 */
 	public function setDisallowedConstants(array $disallow)
