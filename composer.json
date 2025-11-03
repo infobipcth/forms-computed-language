@@ -1,6 +1,6 @@
 {
     "name": "infobipcth/forms-computed-language",
-    "type": "project",
+    "type": "library",
     "description": "A PHP library for safely interpreting user-inputted arbitrary code, specifically designed for supporting logic in forms.",
     "keywords": [
         "infobip",
