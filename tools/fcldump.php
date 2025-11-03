@@ -8,10 +8,19 @@ if ($argc !== 3) {
 $file = $argv[1];
 $variables = $argv[2];
 
+$cwd = getcwd();
+
+if ($file[0] !== '/') {
+	$file = $cwd . '/' . $file;
+}
+if ($variables[0] !== '/') {
+	$variables = $cwd . '/' . $variables;
+}
+
 $code = file_get_contents($file);
 $variables = json_decode(file_get_contents($variables), true);
 
-include '../vendor/autoload.php';
+include __DIR__ . '/../vendor/autoload.php';
 
 use FormsComputedLanguage\LanguageRunner;
 
