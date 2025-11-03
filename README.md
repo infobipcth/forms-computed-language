@@ -319,4 +319,4 @@ _Note that the documentation is AI-assisted and might be inaccurate at times. If
 
 ## About
 
-This project is maintained by Infobip's Creative Tech Hub - the team behind Infobip.com.
+This project is maintained by Infobip's Creative Tech Hub - the team behind infobip.com.
