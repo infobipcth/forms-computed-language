@@ -83,7 +83,7 @@ The `Lifecycle` namespace contains classes that manage the state and environment
 
 -   **Path**: `src/Lifecycle/ConstantsConfiguration.php`
 -   **Role**: Manages the security rules for accessing PHP constants.
--   **Design**: It holds the `whitelist` or `blacklist` behavior, along with the lists of allowed or disallowed constants. The `ConstFetchVisitor` uses the `canAccessConstant()` method to determine if a user's code is permitted to access a given constant.
+-   **Design**: It holds the `allowlist` or `disallowlist` behavior, along with the lists of allowed or disallowed constants. The `ConstFetchVisitor` uses the `canAccessConstant()` method to determine if a user's code is permitted to access a given constant.
 
 ## Exception Handling
 
