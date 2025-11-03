@@ -299,7 +299,7 @@ When reporting bugs, please include:
 
 ### Security
 
-If you discover a security vulnerability which is unsuitable to be reported publicly, please email us at web@infobip.com or use the [https://www.infobip.com/security-trust-center/cvd-policy](Infobip Coordinated Vulnerability Disclosure program).
+If you discover a security vulnerability which is unsuitable to be reported publicly, please email us at web@infobip.com or use the [Infobip Coordinated Vulnerability Disclosure program](https://www.infobip.com/security-trust-center/cvd-policy).
 
 ## License
 
