@@ -304,3 +304,7 @@ If you discover a security vulnerability which is unsuitable to be reported publ
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## About
+
+This project is maintained by Infobip's Creative Tech Hub - the team behind Infobip.com.
