@@ -53,7 +53,7 @@ This structured representation is what FCL actually works with, not the raw code
 Before evaluation, the `LanguageRunner` sets up a secure, isolated environment using the `Harness` class. This involves:
 
 -   **Initializing the `VariableStore`**: The variables you provide via `$lr->setVars()` are loaded into the `VariableStore`, creating the initial state for the program.
--   **Configuring Constants**: The whitelist/blacklist rules for constants are prepared via the `ConstantsConfiguration`.
+-   **Configuring Constants**: The allowlist/disallowlist rules for constants are prepared via the `ConstantsConfiguration`.
 -   **Preparing the `FunctionStore`**: The registry of available functions is made ready.
 
 ### 3. Traversing the AST with the `Evaluator`
