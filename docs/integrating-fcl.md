@@ -52,7 +52,7 @@ A critical feature of FCL is its ability to control access to PHP constants. Thi
 
 **IMPORTANT**: By default, all PHP constants are accessible. You **must** configure the constant behavior to secure your application.
 
-### Whitelist Mode (Recommended)
+### Allowlist Mode (Recommended)
 
 In this mode, only explicitly allowed constants are accessible.
 
