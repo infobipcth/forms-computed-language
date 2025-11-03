@@ -305,6 +305,18 @@ If you discover a security vulnerability which is unsuitable to be reported publ
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
+## Documentation
+
+For detailed documentation, please see the `docs` directory:
+
+- [Integrating FCL into Your Project](./docs/integrating-fcl.md)
+- [Understanding How FCL Evaluates a Program](./docs/evaluation.md)
+- [FCL Internals](./docs/internals.md)
+- [Developer Tools](./docs/tools.md)
+- [Debugging FCL](./docs/debugging.md)
+
+_Note that the documentation is AI-assisted and might be inaccurate at times. If you have any questions, feel free to open an issue._
+
 ## About
 
 This project is maintained by Infobip's Creative Tech Hub - the team behind Infobip.com.
