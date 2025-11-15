@@ -2,6 +2,8 @@
 
 namespace FormsComputedLanguage\Lifecycle;
 
+use FormsComputedLanguage\Exceptions\UndeclaredVariableUsageException;
+
 class VariableStore
 {
 	private static array $variables = [];
@@ -71,8 +73,20 @@ class VariableStore
 	 * @param string $contextHandle A context handle.
 	 * @return mixed Value.
 	 */
-	public static function getArrayVariable(string $arrayName, $arrayKey, string $contextHandle = 'global')
+	public static function getArrayVariable(string $arrayName, $arrayKey, string $contextHandle = 'global', bool $shouldThrow = true)
 	{
+		if (!isset(static::$variables[$contextHandle][$arrayName][$arrayKey])) {
+			// Todo: FCL doesn't handle array dim fetches properly here, and this method seemingly is never called.
+			// Investigation is needed into how we can check for undefined array keys properly when doing ArrayDimFetch.
+
+			if (!$shouldThrow) {
+				return null;
+			}
+
+			throw new UndeclaredVariableUsageException(
+				"The '$arrayName[$arrayKey]' array member variable is not declared in the current context, but usage was attempted."
+			);
+		}
 		return static::$variables[$contextHandle][$arrayName][$arrayKey] ?? '';
 	}
 
@@ -82,9 +96,18 @@ class VariableStore
 	 * @param string $contextHandle A context handle.
 	 * @return mixed Value.
 	 */
-	public static function getVariable(string $name, string $contextHandle = 'global')
+	public static function getVariable(string $name, string $contextHandle = 'global', bool $shouldThrow = true)
 	{
-		return static::$variables[$contextHandle][$name] ?? '';
+		if (!isset(static::$variables[$contextHandle][$name])) {
+			if (!$shouldThrow) {
+				return null;
+			}
+
+			throw new UndeclaredVariableUsageException(
+				"Variable '$name' is not declared in the current context, but usage was attempted, shouldThrow is {$shouldThrow}."
+			);
+		}
+		return static::$variables[$contextHandle][$name];
 	}
 
 

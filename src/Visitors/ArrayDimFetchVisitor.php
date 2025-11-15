@@ -17,7 +17,7 @@ class ArrayDimFetchVisitor implements VisitorInterface
 		if (!($node->getAttribute('parentIsAssignment', false))) {
 			$arrayDim = Stack::pop();
 			$array = Stack::pop();
-			Stack::push($array[$arrayDim]);
+			Stack::push($array[$arrayDim]); // Optimize memory usage here.
 		} else {
 			$assignmentNode = $node->getAttribute('parentAssign');
 			$assignmentNode->setAttribute('isArrayAssignment', true);
