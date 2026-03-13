@@ -2,6 +2,8 @@
 
 namespace Tests\Unit;
 
+use FormsComputedLanguage\Exceptions\UndeclaredVariableUsageException;
+
 test('initializing an array works', function () {
     $code = <<<'CODE'
     $a = ['a' => 17, 'b' => 3, 98, 'some string'];
@@ -66,3 +68,15 @@ test('pushing into an array works', function () {
     $this->languageRunner->evaluate();
     expect($this->languageRunner->getVars())->toBe(['a' => [3, 1, 4]]);
 });
+
+test('null-coalescing an undefined array dimension works', function () {
+	$code = <<<'CODE'
+	$a = ['a' => 17, 'b' => 3, 98, 'some string'];
+	$b = $a['c'] ?? 42;
+	CODE;
+	$this->languageRunner->setCode("$code");
+	$this->languageRunner->setVars([]);
+	$this->languageRunner->evaluate();
+	expect($this->languageRunner->getVars())->toBe(['a' => ['a' => 17, 'b' => 3, 98, 'some string'], 'b' => 42]);
+});
+

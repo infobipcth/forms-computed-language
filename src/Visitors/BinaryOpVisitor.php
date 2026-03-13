@@ -7,6 +7,7 @@ use FormsComputedLanguage\Lifecycle\Stack;
 use PhpParser\Node;
 use PhpParser\Node\Expr\BinaryOp\BooleanAnd;
 use PhpParser\Node\Expr\BinaryOp\BooleanOr;
+use PhpParser\Node\Expr\BinaryOp\Coalesce;
 use PhpParser\Node\Expr\BinaryOp\Concat;
 use PhpParser\Node\Expr\BinaryOp\Div;
 use PhpParser\Node\Expr\BinaryOp\Equal;
@@ -19,6 +20,7 @@ use PhpParser\Node\Expr\BinaryOp\NotEqual;
 use PhpParser\Node\Expr\BinaryOp\Plus;
 use PhpParser\Node\Expr\BinaryOp\Smaller;
 use PhpParser\Node\Expr\BinaryOp\SmallerOrEqual;
+use Throwable;
 
 /**
  * Class handling all binary operators in FCL.
@@ -27,7 +29,10 @@ class BinaryOpVisitor implements VisitorInterface
 {
 	public static function enterNode(Node &$node)
 	{
-		// intentionally left empty: no actions needed when entering the node.
+		if ($node instanceof Coalesce) {
+			// Set the attribute for the LHS to indicate that it is part of a coalesce operation.
+			$node->left->setAttribute('isCoalesceLHS', true);
+		}
 	}
 
 	public static function leaveNode(Node &$node)
@@ -65,6 +70,12 @@ class BinaryOpVisitor implements VisitorInterface
 			Stack::push(($lhs || $rhs));
 		} elseif ($node instanceof Mod) {
 			Stack::push(($lhs % $rhs));
+		} elseif ($node instanceof Coalesce) {
+			try {
+				Stack::push($lhs ?? $rhs);
+			} catch (Throwable) {
+				Stack::push($rhs);
+			}
 		} else {
 			throw new UnknownTokenException("Unknown boolean operator {$nodeType} used");
 		}
