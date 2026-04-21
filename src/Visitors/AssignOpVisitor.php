@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FormsComputedLanguage\Visitors;
 
+use FormsComputedLanguage\Exceptions\DivisionByZeroException;
 use FormsComputedLanguage\Exceptions\UnknownTokenException;
 use FormsComputedLanguage\Lifecycle\Stack;
 use FormsComputedLanguage\Lifecycle\VariableStore;
@@ -28,7 +31,11 @@ class AssignOpVisitor implements VisitorInterface
 		} elseif ($node instanceof AssignOpMul) {
 			VariableStore::setVariable($node->var->name, VariableStore::getVariable($node->var->name) * Stack::pop());
 		} elseif ($node instanceof AssignOpDiv) {
-			VariableStore::setVariable($node->var->name, VariableStore::getVariable($node->var->name) / Stack::pop());
+			$divisor = Stack::pop();
+			if ($divisor == 0) {
+				throw new DivisionByZeroException('Division by zero');
+			}
+			VariableStore::setVariable($node->var->name, VariableStore::getVariable($node->var->name) / $divisor);
 		} elseif ($node instanceof AssignOpConcat) {
 			VariableStore::setVariable($node->var->name, VariableStore::getVariable($node->var->name) . Stack::pop());
 		} else {

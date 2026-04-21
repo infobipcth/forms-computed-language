@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FormsComputedLanguage\Lifecycle;
 
 class ConstantsConfiguration
@@ -51,6 +53,10 @@ class ConstantsConfiguration
 	public function canAccessConstant(string $name): bool
 	{
 		if (!isset($this->behaviour)) {
+			trigger_error(
+				'FCL: Accessing constants without explicitly configuring constant behaviour is deprecated and will be denied by default in the next major version. Call setConstantBehaviour() to configure.',
+				E_USER_DEPRECATED
+			);
 			return true;
 		}
 

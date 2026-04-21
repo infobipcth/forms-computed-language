@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FormsComputedLanguage;
 
 // Imports for...
@@ -87,18 +89,6 @@ class Evaluator extends NodeVisitorAbstract
 	 */
 	public function enterNode(Node $node)
 	{
-		// @codeCoverageIgnoreStart
-		// Debugging helpers are ignored for coverage.
-		if (getenv("FCL_DEBUG") === "debug") {
-			echo "Entering node\n";
-			var_dump(get_class($node));
-			echo "Variable store:\n";
-			var_dump(VariableStore::getVariables());
-			echo "Stack: \n";
-			Stack::debug();
-		}
-		// @codeCoverageIgnoreEnd
-
 		/**
 		 * If this node is part of an if/elseif/else block, we need to be careful:
 		 * 'if' condition should be evaluated always;
@@ -260,14 +250,11 @@ class Evaluator extends NodeVisitorAbstract
 	 * from the stack.
 	 *
 	 * @param Node $node A node to leave.
-	 * @return void Returns void.
 	 * @throws UnknownTokenException If the token for the node is unknown to the evaluator.
 	 * @throws UndeclaredVariableUsageException If an undefined constant is used.
 	 * @throws UnknownFunctionException If an undefined function is called.
-	 * @throws TypeException If a function is called with a wrong argument type.
-	 * @throws ArgumentCountException If a function doesn't accept the given number of arguments.
 	 */
-	public function leaveNode(Node $node)
+	public function leaveNode(Node $node): void
 	{
 		if ($node->getAttribute('shouldEvaluate', true) === false) {
 			// If we shouldn't evaluate this node, skip it.
@@ -353,17 +340,5 @@ class Evaluator extends NodeVisitorAbstract
 				$parentTernary->setAttribute('condTruthy', Stack::pop());
 			}
 		}
-
-		// @codeCoverageIgnoreStart
-		// Debugging helpers are ignored for coverage.
-		if (getenv("FCL_DEBUG") === "debug") {
-			echo "Leaving node\n";
-			var_dump(get_class($node));
-			echo "Variable store:\n";
-			var_dump(VariableStore::getVariables());
-			echo "Stack: \n";
-			Stack::debug();
-		}
-		// @codeCoverageIgnoreEnd
 	}
 }

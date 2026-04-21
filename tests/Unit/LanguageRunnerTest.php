@@ -1,4 +1,8 @@
-<?php /** @noinspection PhpFullyQualifiedNameUsageInspection */
+<?php
+
+declare(strict_types=1);
+
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
 
 namespace Tests\Unit;
 

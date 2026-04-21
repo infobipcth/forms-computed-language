@@ -19,6 +19,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  security-audit:
+    name: "Security audit"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v6"
+
+      - name: "PHP setup"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: "8.5"
+          coverage: "none"
+          tools: composer:v2
+
+      - name: "Install dependencies"
+        uses: "ramsey/composer-install@v3"
+        with:
+          dependency-versions: "highest"
+          custom-cache-suffix: $(date -u "+%Y-%m")
+
+      - name: "Run security audit"
+        run: "composer audit"
+
   syntax-errors:
     name: "Syntax errors checks"
     runs-on: "ubuntu-latest"
@@ -54,8 +77,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: ["8.3", "8.4"]
-    continue-on-error: "${{ matrix.php == '8.4' }}"
+        php: ["8.3", "8.4", "8.5"]
 
     steps:
       - name: "Checkout"
@@ -82,16 +104,15 @@ jobs:
         if: "${{ always() && steps.phpcs.outcome == 'failure' }}"
         run: "cs2pr ./phpcs-report.xml"
 
-  pest:
-    name: "Unit tests on PHP ${{ matrix.php }}"
+  phpstan:
+    name: "Static analysis on PHP ${{ matrix.php }}"
     needs:
       - "syntax-errors"
     runs-on: "ubuntu-latest"
     strategy:
       fail-fast: true
       matrix:
-        php: ["8.3", "8.4"]
-    continue-on-error: "${{ matrix.php == '8.4' }}"
+        php: ["8.3", "8.4", "8.5"]
 
     steps:
       - name: "Checkout"
@@ -110,6 +131,43 @@ jobs:
           dependency-versions: "highest"
           custom-cache-suffix: $(date -u "+%Y-%m")
 
+      - name: "Run PHPStan"
+        run: "composer test:phpstan"
+
+  pest:
+    name: "Unit tests on PHP ${{ matrix.php }} (${{ matrix.dependency-versions }})"
+    needs:
+      - "syntax-errors"
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: true
+      matrix:
+        php: ["8.3", "8.4", "8.5"]
+        dependency-versions: ["highest", "lowest"]
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v6"
+
+      - name: "PHP setup"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          php-version: "${{ matrix.php }}"
+          coverage: "${{ matrix.php == '8.5' && matrix.dependency-versions == 'highest' && 'xdebug' || 'none' }}"
+          tools: composer:v2
+
+      - name: "Install dependencies"
+        uses: "ramsey/composer-install@v3"
+        with:
+          dependency-versions: "${{ matrix.dependency-versions }}"
+          custom-cache-suffix: $(date -u "+%Y-%m")
+
       - name: "Run unit tests using Pest"
         id: pest
         run: "composer test:unit"
+
+      - name: "Run coverage check"
+        if: "${{ matrix.php == '8.5' && matrix.dependency-versions == 'highest' }}"
+        run: "php -dxdebug.mode=coverage ./vendor/bin/pest --coverage --min=80"
+        env:
+          XDEBUG_MODE: coverage

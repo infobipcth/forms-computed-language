@@ -6,6 +6,6 @@ namespace FormsComputedLanguage\Exceptions;
 
 use Exception;
 
-class UnknownTokenException extends Exception
+class DivisionByZeroException extends Exception
 {
 }

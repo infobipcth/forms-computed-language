@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use FormsComputedLanguage\LanguageRunner;
 use PHPUnit\Framework\TestCase;
 

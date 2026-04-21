@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FormsComputedLanguage\Visitors;
 
-use FormsComputedLanguage\Exceptions\UnknownFunctionException;
 use FormsComputedLanguage\Functions\Abs;
 use FormsComputedLanguage\Functions\CountSelectedItems;
 use FormsComputedLanguage\Functions\IsSelected;
@@ -45,13 +46,9 @@ class FuncCallVisitor implements VisitorInterface
 
 		$argv = array_reverse($argv);
 
-		try {
-			if (!isset(self::FUNCTION_CALLBACKS[$functionName])) {
-				throw new UnknownFunctionException("Undefined function {$functionName} called");
-			}
-
+		if (isset(self::FUNCTION_CALLBACKS[$functionName])) {
 			Stack::push(call_user_func_array(self::FUNCTION_CALLBACKS[$functionName], [$argv]));
-		} catch (UnknownFunctionException $e) {
+		} else {
 			Stack::push(FunctionStore::runFunction($functionName, $argv));
 		}
 	}

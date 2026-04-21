@@ -1,0 +1,733 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Return type \(void\) of method FormsComputedLanguage\\Evaluator\:\:leaveNode\(\) should be compatible with return type \(array\<PhpParser\\Node\>\|int\|PhpParser\\Node\|null\) of method PhpParser\\NodeVisitor\:\:leaveNode\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: src/Evaluator.php
+
+		-
+			message: '#^Return type \(void\) of method FormsComputedLanguage\\Evaluator\:\:leaveNode\(\) should be compatible with return type \(array\<PhpParser\\Node\>\|int\|PhpParser\\Node\|null\) of method PhpParser\\NodeVisitorAbstract\:\:leaveNode\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: src/Evaluator.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Functions\\Abs\:\:getArguments\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Functions/Abs.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Functions\\Abs\:\:run\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Functions/Abs.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Functions\\CountSelectedItems\:\:getArguments\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Functions/CountSelectedItems.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Functions\\CountSelectedItems\:\:run\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Functions/CountSelectedItems.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Functions\\FunctionInterface\:\:getArguments\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Functions/FunctionInterface.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Functions\\FunctionInterface\:\:run\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Functions/FunctionInterface.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Functions\\FunctionInterface\:\:run\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Functions/FunctionInterface.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Functions\\IsSelected\:\:getArguments\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Functions/IsSelected.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Functions\\IsSelected\:\:run\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Functions/IsSelected.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Functions\\NumberFormat\:\:getArguments\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Functions/NumberFormat.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Functions\\NumberFormat\:\:run\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Functions/NumberFormat.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Functions\\Round\:\:getArguments\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Functions/Round.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Functions\\Round\:\:run\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Functions/Round.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Helpers\:\:arrayEnd\(\) has parameter \$arr with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Helpers.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Helpers\:\:getFqnFromParts\(\) has parameter \$parts with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Helpers.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\LanguageRunner\:\:getVars\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/LanguageRunner.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\LanguageRunner\:\:setAllowedConstants\(\) has parameter \$allow with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/LanguageRunner.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\LanguageRunner\:\:setDisallowedConstants\(\) has parameter \$disallow with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/LanguageRunner.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\LanguageRunner\:\:setVars\(\) has parameter \$vars with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/LanguageRunner.php
+
+		-
+			message: '#^Property FormsComputedLanguage\\LanguageRunner\:\:\$ast has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/LanguageRunner.php
+
+		-
+			message: '#^Property FormsComputedLanguage\\LanguageRunner\:\:\$code has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/LanguageRunner.php
+
+		-
+			message: '#^Property FormsComputedLanguage\\LanguageRunner\:\:\$evaluator has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/LanguageRunner.php
+
+		-
+			message: '#^Property FormsComputedLanguage\\LanguageRunner\:\:\$instances has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/LanguageRunner.php
+
+		-
+			message: '#^Property FormsComputedLanguage\\LanguageRunner\:\:\$parser has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/LanguageRunner.php
+
+		-
+			message: '#^Property FormsComputedLanguage\\LanguageRunner\:\:\$vars has no type specified\.$#'
+			identifier: missingType.property
+			count: 1
+			path: src/LanguageRunner.php
+
+		-
+			message: '#^Unsafe access to private property FormsComputedLanguage\\LanguageRunner\:\:\$parser through static\:\:\.$#'
+			identifier: staticClassAccess.privateProperty
+			count: 3
+			path: src/LanguageRunner.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: src/LanguageRunner.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\LanguageRunnerInterface\:\:canAccessConstant\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/LanguageRunnerInterface.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\LanguageRunnerInterface\:\:evaluate\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/LanguageRunnerInterface.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\LanguageRunnerInterface\:\:getVars\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/LanguageRunnerInterface.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\LanguageRunnerInterface\:\:setAllowedConstants\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/LanguageRunnerInterface.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\LanguageRunnerInterface\:\:setAllowedConstants\(\) has parameter \$allow with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/LanguageRunnerInterface.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\LanguageRunnerInterface\:\:setCode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/LanguageRunnerInterface.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\LanguageRunnerInterface\:\:setConstantBehaviour\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/LanguageRunnerInterface.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\LanguageRunnerInterface\:\:setDisallowedConstants\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/LanguageRunnerInterface.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\LanguageRunnerInterface\:\:setDisallowedConstants\(\) has parameter \$disallow with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/LanguageRunnerInterface.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\LanguageRunnerInterface\:\:setVars\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/LanguageRunnerInterface.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\LanguageRunnerInterface\:\:setVars\(\) has parameter \$vars with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/LanguageRunnerInterface.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Lifecycle\\ConstantsConfiguration\:\:setAllowedConstants\(\) has parameter \$allow with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Lifecycle/ConstantsConfiguration.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Lifecycle\\ConstantsConfiguration\:\:setDisallowedConstants\(\) has parameter \$disallow with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Lifecycle/ConstantsConfiguration.php
+
+		-
+			message: '#^Property FormsComputedLanguage\\Lifecycle\\ConstantsConfiguration\:\:\$allowedConstants \(array\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Lifecycle/ConstantsConfiguration.php
+
+		-
+			message: '#^Property FormsComputedLanguage\\Lifecycle\\ConstantsConfiguration\:\:\$allowedConstants type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Lifecycle/ConstantsConfiguration.php
+
+		-
+			message: '#^Property FormsComputedLanguage\\Lifecycle\\ConstantsConfiguration\:\:\$disallowedConstants \(array\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Lifecycle/ConstantsConfiguration.php
+
+		-
+			message: '#^Property FormsComputedLanguage\\Lifecycle\\ConstantsConfiguration\:\:\$disallowedConstants type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Lifecycle/ConstantsConfiguration.php
+
+		-
+			message: '#^Call to function is_array\(\) with array\{''FormsComputedLanguage\\\\Functions\\\\Abs''\|''FormsComputedLanguage\\\\Functions\\\\CountSelectedItems''\|''FormsComputedLanguage\\\\Functions\\\\IsSelected''\|''FormsComputedLanguage\\\\Functions\\\\NumberFormat''\|''FormsComputedLanguage\\\\Functions\\\\Round'', ''run''\} will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Lifecycle/FunctionStore.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Lifecycle\\FunctionStore\:\:getFunctionList\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Lifecycle/FunctionStore.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Lifecycle\\FunctionStore\:\:getFunctionsWithArgumentList\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Lifecycle/FunctionStore.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Lifecycle\\FunctionStore\:\:runFunction\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Lifecycle/FunctionStore.php
+
+		-
+			message: '#^Unsafe access to private property FormsComputedLanguage\\Lifecycle\\FunctionStore\:\:\$functions through static\:\:\.$#'
+			identifier: staticClassAccess.privateProperty
+			count: 6
+			path: src/Lifecycle/FunctionStore.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Lifecycle\\Harness\:\:bootstrap\(\) has parameter \$variables with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Lifecycle/Harness.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Lifecycle\\Harness\:\:setVariableStore\(\) has parameter \$_variableStore with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Lifecycle/Harness.php
+
+		-
+			message: '#^Unsafe access to private property FormsComputedLanguage\\Lifecycle\\Harness\:\:\$constantsConfiguration through static\:\:\.$#'
+			identifier: staticClassAccess.privateProperty
+			count: 8
+			path: src/Lifecycle/Harness.php
+
+		-
+			message: '#^Unsafe access to private property FormsComputedLanguage\\Lifecycle\\Harness\:\:\$parser through static\:\:\.$#'
+			identifier: staticClassAccess.privateProperty
+			count: 2
+			path: src/Lifecycle/Harness.php
+
+		-
+			message: '#^Unsafe access to private property FormsComputedLanguage\\Lifecycle\\Harness\:\:\$variableStore through static\:\:\.$#'
+			identifier: staticClassAccess.privateProperty
+			count: 4
+			path: src/Lifecycle/Harness.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Lifecycle\\Stack\:\:push\(\) has parameter \$value with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Lifecycle/Stack.php
+
+		-
+			message: '#^Property FormsComputedLanguage\\Lifecycle\\Stack\:\:\$stack type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Lifecycle/Stack.php
+
+		-
+			message: '#^Unsafe access to private property FormsComputedLanguage\\Lifecycle\\Stack\:\:\$stack through static\:\:\.$#'
+			identifier: staticClassAccess.privateProperty
+			count: 4
+			path: src/Lifecycle/Stack.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Lifecycle\\VariableStore\:\:getVariables\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Lifecycle/VariableStore.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Lifecycle\\VariableStore\:\:resetContext\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Lifecycle/VariableStore.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Lifecycle\\VariableStore\:\:setVariables\(\) has parameter \$variables with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Lifecycle/VariableStore.php
+
+		-
+			message: '#^Property FormsComputedLanguage\\Lifecycle\\VariableStore\:\:\$variables type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Lifecycle/VariableStore.php
+
+		-
+			message: '#^Unsafe access to private property FormsComputedLanguage\\Lifecycle\\VariableStore\:\:\$variables through static\:\:\.$#'
+			identifier: staticClassAccess.privateProperty
+			count: 14
+			path: src/Lifecycle/VariableStore.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\:\:\$var\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Visitors/ArrayDimFetchVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ArrayDimFetchVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ArrayDimFetchVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ArrayDimFetchVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ArrayDimFetchVisitor.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\:\:\$key\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Visitors/ArrayItemVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ArrayItemVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ArrayItemVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ArrayItemVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ArrayItemVisitor.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\:\:\$items\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Visitors/ArrayVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ArrayVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ArrayVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ArrayVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ArrayVisitor.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\\Expr\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 10
+			path: src/Visitors/AssignOpVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\AssignOpVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/AssignOpVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\AssignOpVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/AssignOpVisitor.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\:\:\$var\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Visitors/AssignVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\AssignVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/AssignVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\AssignVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/AssignVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\BinaryOpVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/BinaryOpVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\BinaryOpVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/BinaryOpVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\BreakVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/BreakVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\BreakVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/BreakVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\CastVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/CastVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\CastVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/CastVisitor.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 4
+			path: src/Visitors/ConstFetchVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ConstFetchVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ConstFetchVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ConstFetchVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ConstFetchVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ContinueVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ContinueVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ContinueVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ContinueVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ElseIfVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ElseIfVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ElseIfVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ElseIfVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ElseVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ElseVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ElseVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ElseVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ExecutionChangeExceptions\\ExecutionChangeException\:\:throw\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ExecutionChangeExceptions/ExecutionChangeException.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\:\:\$expr\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Visitors/ForeachVisitor.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\:\:\$keyVar\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Visitors/ForeachVisitor.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\:\:\$stmts\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Visitors/ForeachVisitor.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\:\:\$valueVar\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Visitors/ForeachVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ForeachVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ForeachVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ForeachVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ForeachVisitor.php
+
+		-
+			message: '#^Using nullsafe property access on non\-nullable type PhpParser\\Node\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: src/Visitors/ForeachVisitor.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\:\:\$args\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Visitors/FuncCallVisitor.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Visitors/FuncCallVisitor.php
+
+		-
+			message: '#^Cannot call method getParts\(\) on float\|int\|string\|false\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Visitors/FuncCallVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\FuncCallVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/FuncCallVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\FuncCallVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/FuncCallVisitor.php
+
+		-
+			message: '#^If condition is always true\.$#'
+			identifier: if.alwaysTrue
+			count: 1
+			path: src/Visitors/IfVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\IfVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/IfVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\IfVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/IfVisitor.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\\Scalar\:\:\$value\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Visitors/ScalarVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ScalarVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ScalarVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\ScalarVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/ScalarVisitor.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\:\:\$cond\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Visitors/TernaryVisitor.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\:\:\$else\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Visitors/TernaryVisitor.php
+
+		-
+			message: '#^Access to an undefined property PhpParser\\Node\:\:\$if\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Visitors/TernaryVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\TernaryVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/TernaryVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\TernaryVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/TernaryVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\VariableVisitor\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/VariableVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\VariableVisitor\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/VariableVisitor.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\VisitorInterface\:\:enterNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/VisitorInterface.php
+
+		-
+			message: '#^Method FormsComputedLanguage\\Visitors\\VisitorInterface\:\:leaveNode\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Visitors/VisitorInterface.php

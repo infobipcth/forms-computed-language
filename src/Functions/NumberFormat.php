@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FormsComputedLanguage\Functions;
 
 use FormsComputedLanguage\Exceptions\ArgumentCountException;

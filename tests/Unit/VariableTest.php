@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use FormsComputedLanguage\Exceptions\UndeclaredVariableUsageException;
 
 test('using an undeclared var throws', function () {

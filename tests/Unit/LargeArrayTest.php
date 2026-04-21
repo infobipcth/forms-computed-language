@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit;
 
 test('Test that looping through large dataset works', function ($arrayData) {

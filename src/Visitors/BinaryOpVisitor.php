@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FormsComputedLanguage\Visitors;
 
+use FormsComputedLanguage\Exceptions\DivisionByZeroException;
 use FormsComputedLanguage\Exceptions\UnknownTokenException;
 use FormsComputedLanguage\Lifecycle\Stack;
 use PhpParser\Node;
@@ -20,7 +23,6 @@ use PhpParser\Node\Expr\BinaryOp\NotEqual;
 use PhpParser\Node\Expr\BinaryOp\Plus;
 use PhpParser\Node\Expr\BinaryOp\Smaller;
 use PhpParser\Node\Expr\BinaryOp\SmallerOrEqual;
-use Throwable;
 
 /**
  * Class handling all binary operators in FCL.
@@ -51,6 +53,9 @@ class BinaryOpVisitor implements VisitorInterface
 		} elseif ($node instanceof Mul) {
 			Stack::push($lhs * $rhs);
 		} elseif ($node instanceof Div) {
+			if ($rhs == 0) {
+				throw new DivisionByZeroException('Division by zero');
+			}
 			Stack::push($lhs / $rhs);
 		} elseif ($node instanceof Equal) {
 			Stack::push($lhs == $rhs);
@@ -69,13 +74,12 @@ class BinaryOpVisitor implements VisitorInterface
 		} elseif ($node instanceof BooleanOr) {
 			Stack::push(($lhs || $rhs));
 		} elseif ($node instanceof Mod) {
+			if ($rhs == 0) {
+				throw new DivisionByZeroException('Modulo by zero');
+			}
 			Stack::push(($lhs % $rhs));
 		} elseif ($node instanceof Coalesce) {
-			try {
-				Stack::push($lhs ?? $rhs);
-			} catch (Throwable) {
-				Stack::push($rhs);
-			}
+			Stack::push($lhs ?? $rhs);
 		} else {
 			throw new UnknownTokenException("Unknown boolean operator {$nodeType} used");
 		}

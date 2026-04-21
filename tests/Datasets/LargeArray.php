@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 dataset('largeArray', [[[
     'region' => 'Europe',
     'country' => 'United States',
