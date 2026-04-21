@@ -44,7 +44,7 @@ class IsSelected implements FunctionInterface
 		}
 
 		if (!is_array($args[0])) {
-			return false;
+			return $args[0] === $args[1];
 		}
 
 		return in_array($args[1], $args[0], true);
