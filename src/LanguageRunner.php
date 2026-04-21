@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FormsComputedLanguage;
 
 use Error;
 use Exception;
+use FormsComputedLanguage\Lifecycle\FunctionStore;
 use FormsComputedLanguage\Lifecycle\Harness;
+use FormsComputedLanguage\Lifecycle\Stack;
 use FormsComputedLanguage\Lifecycle\VariableStore;
 use PhpParser\NodeDumper;
 use PhpParser\NodeTraverser;
@@ -135,8 +139,9 @@ class LanguageRunner implements LanguageRunnerInterface
 	 */
 	public function evaluate()
 	{
+		Stack::reset();
 		VariableStore::reset();
-		Harness::bootstrap(variables: $this->vars, _parser: static::$parser);
+		Harness::bootstrap(variables: $this->vars ?? [], _parser: static::$parser);
 		$traverser = new NodeTraverser();
 		self::$evaluator = new Evaluator();
 		$traverser->addVisitor(self::$evaluator);

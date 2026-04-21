@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FormsComputedLanguage\Lifecycle;
 
 use FormsComputedLanguage\Helpers;
@@ -39,12 +41,8 @@ class Stack
 		return Helpers::arrayEnd(static::$stack);
 	}
 
-	/**
-	 * Dumps the stack in var_dump format to stdout.
-	 * @return void
-	 */
-	public static function debug()
+	public static function reset(): void
 	{
-		var_dump(static::$stack);
+		static::$stack = [];
 	}
 }

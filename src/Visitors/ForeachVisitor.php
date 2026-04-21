@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FormsComputedLanguage\Visitors;
 
 use FormsComputedLanguage\LanguageRunner;
@@ -34,17 +36,16 @@ class ForeachVisitor implements VisitorInterface
 			// traverse the statements in a loop.
 
 			try {
-				// Catch break and continue exceptions.
 				$isolatedLoopContextTraverser->traverse($node->stmts);
 			} catch (\Exception $e) {
-				// If exception is for break, remove from store and don't traverse children.
 				if ($e instanceof BreakOutOfLoopException) {
 					$iterationKeyVariableName ? VariableStore::unset($iterationKeyVariableName) : null;
 					$iterationValueVariableName ? VariableStore::unset($iterationValueVariableName) : null;
 					DontTraverseChildren::throw();
 				} elseif ($e instanceof ContinueLoopException) {
-					// continue to the next iteration.
 					continue;
+				} else {
+					throw $e;
 				}
 			}
 		}

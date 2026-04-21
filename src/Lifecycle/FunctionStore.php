@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace FormsComputedLanguage\Lifecycle;
 
 use FormsComputedLanguage\Exceptions\FunctionRedeclarationException;
@@ -34,7 +36,7 @@ class FunctionStore
 
 	public static function getFunctionList(): array
 	{
-		return array_keys(static::$functions) + array_keys(FuncCallVisitor::FUNCTION_CALLBACKS);
+		return array_merge(array_keys(static::$functions), array_keys(FuncCallVisitor::FUNCTION_CALLBACKS));
 	}
 
 	public static function getFunctionsWithArgumentList(): array
@@ -75,12 +77,17 @@ class FunctionStore
 		return $listOut;
 	}
 
-	public static function runFunction(string $functionName, array $args)
+	public static function runFunction(string $functionName, array $args): mixed
 	{
 		if (isset(static::$functions[$functionName])) {
 			return static::$functions[$functionName]->run($args);
 		}
 
 		throw new UnknownFunctionException("Undefined function {$functionName} called");
+	}
+
+	public static function reset(): void
+	{
+		static::$functions = [];
 	}
 }
